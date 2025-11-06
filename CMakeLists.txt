@@ -22,6 +22,8 @@ include_directories(
 )
 
 add_executable(robot_inspection src/robot_inspection.cpp)
+add_executable(demo src/demo.cpp)
+
 
 ament_target_dependencies(robot_inspection
   rclcpp
@@ -32,7 +34,16 @@ ament_target_dependencies(robot_inspection
   #robotino_msgs
 )
 
-install(TARGETS robot_inspection
+ament_target_dependencies(demo
+  rclcpp
+  std_msgs
+  listener_interfaces
+  hri_tools
+  #geometry_msgs
+  #robotino_msgs
+)
+
+install(TARGETS robot_inspection demo
   DESTINATION lib/${PROJECT_NAME}
 )
 
