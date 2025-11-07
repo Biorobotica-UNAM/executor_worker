@@ -3,10 +3,12 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <sstream>
 
 #include "rclcpp/rclcpp.hpp"
 #include "hri_tools/HRI.h"
-// #include "navigation_tools/Navigation.h"
+#include "navigation_tools/Navigation.h"
+#include "std_msgs/msg/string.hpp"
 
 enum SMState
 {
@@ -16,13 +18,41 @@ enum SMState
     SM_FINAL_STATE
 };
 
+std::string last_instruction_third_token = "";
+
+void instruction_callback(const std_msgs::msg::String::SharedPtr msg)
+{
+    std::stringstream ss(msg->data);
+    std::string token;
+    int count = 0;
+    while (ss >> token)
+    {
+        count++;
+        if (count == 3)
+        {
+            last_instruction_third_token = token;
+            break;
+        }
+    }
+    std::cout << "[Subscriber] Received: " << msg->data 
+              << " | Third token: " << last_instruction_third_token << std::endl;
+}
+
 int main(int argc, char** argv)
 {
     rclcpp::init(argc, argv);
     auto node = rclcpp::Node::make_shared("robot_inspection");
 
     auto hri = std::make_shared<HRI>(node);
-    // auto nav = std::make_shared<Navigation>(node);
+    auto nav = std::make_shared<Navigation>(node);
+
+    // --- Nuevo subscriber ---
+    auto instruction_sub = node->create_subscription<std_msgs::msg::String>(
+        "/instruction_msg",
+        10,
+        instruction_callback
+    );
+    // -------------------------
 
     rclcpp::Rate loop(10);
     SMState state = SM_INIT;
@@ -44,12 +74,13 @@ int main(int argc, char** argv)
 
             case SM_WAIT_FOR_COMMAND:
                 std::cout << "[SM_WAIT_FOR_COMMAND]" << std::endl;
-                recog = hri->listen("demo.json");
-                std::cout << "Recognized: " << recog << std::endl;
+                std::cout << "Waiting for message on /instruction_msg..." << std::endl;
 
-                if (!recog.empty())
+                // Usa el token recibido como destino
+                if (!last_instruction_third_token.empty())
                 {
-                    destination = recog;
+                    destination = last_instruction_third_token;
+                    std::cout << "Destination: " << destination << std::endl;
                     state = SM_NAVIGATE_TO_DESTINATION;
                 }
                 break;
@@ -58,8 +89,7 @@ int main(int argc, char** argv)
                 std::cout << "[SM_NAVIGATE_TO_DESTINATION]" << std::endl;
                 hri->say("I am going to " + destination);
 
-                // goal = nav->getCoordinates(destination);
-                // nav->getClose(goal[0], goal[1], goal[2], 180000);
+                nav->goTo(destination);
 
                 hri->say("I have arrived at " + destination);
                 state = SM_FINAL_STATE;
@@ -82,4 +112,3 @@ int main(int argc, char** argv)
     rclcpp::shutdown();
     return 0;
 }
-
