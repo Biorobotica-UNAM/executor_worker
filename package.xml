@@ -16,6 +16,7 @@
   <depend>vosk_speech_recognition</depend>
   <depend>hri_tools</depend>
   <depend>navigation_tools</depend>
+  <depend>service</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
