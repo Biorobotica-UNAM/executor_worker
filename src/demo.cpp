@@ -10,7 +10,7 @@
 #include "navigation_tools/Navigation.h"
 #include "std_msgs/msg/string.hpp"
 #include "std_srvs/srv/trigger.hpp"
-#include "service/srv/string.hpp"  // Incluir el header del servicio personalizado
+#include "service/srv/string.hpp"  
 
 enum SMState
 {
@@ -49,8 +49,8 @@ int main(int argc, char** argv)
     // --- Cliente para el servicio /request_instruction ---
     auto service_client = node->create_client<std_srvs::srv::Trigger>("/request_instruction");
     
-    // --- Cliente para el servicio personalizado natural_to_clips/interpret ---
-    auto interpret_client = node->create_client<service::srv::String>("natural_to_clips/interpret");
+    // --- Cliente para el servicio natural_to_clips/interpret ---
+    auto interpret_client = node->create_client<service::srv::String>("/natural_to_clips/interpret");
     
     // Esperar a que ambos servicios estén disponibles
     while (!service_client->wait_for_service(std::chrono::seconds(1)) || 
@@ -97,7 +97,7 @@ int main(int argc, char** argv)
                         {
                             auto interpret_response = interpret_future.get();
                             std::cout << "Interpret service returned: " << interpret_response->data << std::endl;
-                            // Procesar la respuesta si es necesario
+                            // Procesar la respuesta
                         } else {
                             std::cout << "Interpret service call failed or timed out" << std::endl;
                         }
