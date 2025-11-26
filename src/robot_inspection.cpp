@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 
             case SM_WAIT_FOR_COMMAND:
                 std::cout << "[SM_WAIT_FOR_COMMAND]" << std::endl;
-                recog = hri->listen("test.json");
+                recog = hri->Listen("test.json");
 
                 std::cout << recog << std::endl;
 
