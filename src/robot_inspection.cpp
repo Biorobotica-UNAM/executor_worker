@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "rclcpp/rclcpp.hpp"
-#include "hri_tools/HRI.h"
+#include "hri_tools/HRI.hpp"
 // #include "navigation_tools/Navigation.h"
 
 enum SMState
