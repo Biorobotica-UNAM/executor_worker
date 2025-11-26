@@ -12,6 +12,7 @@ find_package(hri_tools REQUIRED)
 find_package(navigation_tools REQUIRED)
 #find_package(geometry_msgs REQUIRED)
 #find_package(robotino_msgs REQUIRED)
+find_package(service REQUIRED)
 
 include_directories(
   include
@@ -23,6 +24,7 @@ include_directories(
   ${navigation_tools_INCLUDE_DIRS}
   #${geometry_msgs_INCLUDE_DIRS}
   #${robotino_msgs_INCLUDE_DIRS}
+  ${service_INCLUDE_DIRS}
 )
 
 add_executable(robot_inspection src/robot_inspection.cpp)
@@ -38,6 +40,7 @@ ament_target_dependencies(robot_inspection
   navigation_tools
   #geometry_msgs
   #robotino_msgs
+  service
 )
 
 ament_target_dependencies(demo
@@ -49,6 +52,7 @@ ament_target_dependencies(demo
   navigation_tools
   #geometry_msgs
   #robotino_msgs
+  service
 )
 
 install(TARGETS robot_inspection demo
