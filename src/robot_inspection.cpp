@@ -37,19 +37,19 @@ int main(int argc, char** argv)
         {
             case SM_INIT:
                 std::cout << "[SM_INIT]" << std::endl;
-                hri->say("I am ready for robot inspection");
+                hri->Say("I am ready for robot inspection");
                 state = SM_NAVIGATE_TO_INSPECTION;
                 break;
 
             case SM_NAVIGATE_TO_INSPECTION:
                 std::cout << "[SM_NAVIGATE_TO_INSPECTION]" << std::endl;
-                hri->say("I am going to the inspection point");
+                hri->Say("I am going to the inspection point");
 
                 // goal = nav->getCoordinates("entrance_door");
                 // nav->getClose(goal[0], goal[1], goal[2], 120000);
 
-                hri->say("I have arrived at the inspection point");
-                hri->say("Please tell me to continue to the exit");
+                hri->Say("I have arrived at the inspection point");
+                hri->Say("Please tell me to continue to the exit");
                 state = SM_WAIT_FOR_COMMAND;
                 break;
 
@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 
             case SM_NAVIGATE_TO_EXIT:
                 std::cout << "[SM_NAVIGATE_TO_EXIT]" << std::endl;
-                hri->say("I am going to the exit point");
+                hri->Say("I am going to the exit point");
 
                 // goal = nav->getCoordinates("inspection_point");
                 // nav->getClose(goal[0], goal[1], goal[2], 180000);
@@ -77,7 +77,7 @@ int main(int argc, char** argv)
 
             case SM_FINAL_STATE:
                 std::cout << "[SM_FINAL_STATE]" << std::endl;
-                hri->say("I have finished the test");
+                hri->Say("I have finished the test");
                 finished = true;
                 break;
 

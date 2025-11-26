@@ -78,8 +78,8 @@ int main(int argc, char** argv)
             case SM_INIT:
                 {
                     std::cout << "[SM_INIT]" << std::endl;
-                    hri->say("Hello, I am Justina");
-                    hri->say("Please tell me where to navigate");
+                    hri->Say("Hello, I am Justina");
+                    hri->Say("Please tell me where to navigate");
                     
                     // Llamar al servicio de interpretación
                     if (!interpret_service_called) {
@@ -139,13 +139,13 @@ int main(int argc, char** argv)
                             } else {
                                 std::cout << "Service call succeeded but returned failure: " 
                                           << response->message << std::endl;
-                                hri->say("I received an invalid instruction, please try again");
+                                hri->Say("I received an invalid instruction, please try again");
                                 // Reset the flag to try again
                                 service_called = false;
                             }
                         } else {
                             std::cout << "Service call failed or timed out" << std::endl;
-                            hri->say("I could not get instructions, please try again");
+                            hri->Say("I could not get instructions, please try again");
                             // Reset the flag to try again
                             service_called = false;
                         }
@@ -157,17 +157,17 @@ int main(int argc, char** argv)
 
             case SM_NAVIGATE_TO_DESTINATION:
                 std::cout << "[SM_NAVIGATE_TO_DESTINATION]" << std::endl;
-                hri->say("I am going to " + destination);
+                hri->Say("I am going to " + destination);
 
                 nav->goTo(destination);
 
-                hri->say("I have arrived at " + destination);
+                hri->Say("I have arrived at " + destination);
                 state = SM_FINAL_STATE;
                 break;
 
             case SM_FINAL_STATE:
                 std::cout << "[SM_FINAL_STATE]" << std::endl;
-                hri->say("I have finished the navigation demo");
+                hri->Say("I have finished the navigation demo");
                 finished = true;
                 break;
 
