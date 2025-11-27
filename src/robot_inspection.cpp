@@ -23,7 +23,7 @@ int main(int argc, char** argv)
     auto node = rclcpp::Node::make_shared("robot_inspection");
 
     auto hri = std::make_shared<HRI>(node);
-    // auto nav = std::make_shared<Navigation>(node);
+    auto nav = std::make_shared<Navigation>(node);
 
     rclcpp::Rate loop(10);
     SMState state = SM_INIT;
@@ -45,8 +45,7 @@ int main(int argc, char** argv)
                 std::cout << "[SM_NAVIGATE_TO_INSPECTION]" << std::endl;
                 hri->Say("I am going to the inspection point");
 
-                // goal = nav->getCoordinates("entrance_door");
-                // nav->getClose(goal[0], goal[1], goal[2], 120000);
+                nav->goTo("living_room");
 
                 hri->Say("I have arrived at the inspection point");
                 hri->Say("Please tell me to continue to the exit");
@@ -69,8 +68,7 @@ int main(int argc, char** argv)
                 std::cout << "[SM_NAVIGATE_TO_EXIT]" << std::endl;
                 hri->Say("I am going to the exit point");
 
-                // goal = nav->getCoordinates("inspection_point");
-                // nav->getClose(goal[0], goal[1], goal[2], 180000);
+		nav->goTo("living_room");
 
                 state = SM_FINAL_STATE;
                 break;
