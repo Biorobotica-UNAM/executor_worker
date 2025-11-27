@@ -7,7 +7,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "hri_tools/HRI.hpp"
-#include "navigation_tools/Navigation.h"
+#include "navigation_tools/Navigation.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "std_srvs/srv/trigger.hpp"
 #include "service/srv/string.hpp"  

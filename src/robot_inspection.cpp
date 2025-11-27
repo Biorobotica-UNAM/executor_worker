@@ -6,7 +6,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "hri_tools/HRI.hpp"
-#include "navigation_tools/Navigation.h"
+#include "navigation_tools/Navigation.hpp"
 
 enum SMState
 {
@@ -68,7 +68,7 @@ int main(int argc, char** argv)
                 std::cout << "[SM_NAVIGATE_TO_EXIT]" << std::endl;
                 hri->Say("I am going to the exit point");
 
-		nav->goTo("living_room");
+		nav->goTo("door");
 
                 state = SM_FINAL_STATE;
                 break;
