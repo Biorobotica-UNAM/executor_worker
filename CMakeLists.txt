@@ -22,13 +22,12 @@ include_directories(
   ${known_locations_interfaces_INCLUDE_DIRS}
   ${hri_tools_INCLUDE_DIRS}
   ${navigation_tools_INCLUDE_DIRS}
-  #${geometry_msgs_INCLUDE_DIRS}
-  #${robotino_msgs_INCLUDE_DIRS}
   ${service_INCLUDE_DIRS}
 )
 
 add_executable(robot_inspection src/robot_inspection.cpp)
 add_executable(demo src/demo.cpp)
+add_executable(help_me_carry src/help_me_carry.cpp)
 
 
 ament_target_dependencies(robot_inspection
@@ -38,8 +37,6 @@ ament_target_dependencies(robot_inspection
   known_locations_interfaces
   hri_tools
   navigation_tools
-  #geometry_msgs
-  #robotino_msgs
   service
 )
 
@@ -50,12 +47,20 @@ ament_target_dependencies(demo
   known_locations_interfaces
   hri_tools
   navigation_tools
-  #geometry_msgs
-  #robotino_msgs
   service
 )
 
-install(TARGETS robot_inspection demo
+ament_target_dependencies(help_me_carry
+  rclcpp
+  std_msgs
+  listener_interfaces
+  known_locations_interfaces
+  hri_tools
+  navigation_tools
+  service
+)
+
+install(TARGETS robot_inspection demo help_me_carry
   DESTINATION lib/${PROJECT_NAME}
 )
 
