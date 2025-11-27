@@ -159,7 +159,7 @@ int main(int argc, char** argv)
                 std::cout << "[SM_NAVIGATE_TO_DESTINATION]" << std::endl;
                 hri->Say("I am going to " + destination);
 
-                nav->goTo(destination);
+                nav->GoTo(destination);
 
                 hri->Say("I have arrived at " + destination);
                 state = SM_FINAL_STATE;

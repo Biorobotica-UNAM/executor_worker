@@ -42,7 +42,7 @@ int main(int argc, char** argv)
                 std::cout << "[SM_NAVIGATE_TO_INSPECTION]" << std::endl;
                 hri->Say("I am going to the inspection point");
 
-                navigation->goTo("kitchen");
+                navigation->GoTo("kitchen");
 
                 hri->Say("I have arrived at the inspection point. Please tell me to continue to the exit");
                 state = SM_WAIT_FOR_COMMAND;
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
                 std::cout << "[SM_NAVIGATE_TO_EXIT]" << std::endl;
                 hri->Say("I am going to the exit point");
 
-                navigation->goTo("door");
+                navigation->GoTo("door");
 
                 state = SM_FINISH_TASK;
                 break;
