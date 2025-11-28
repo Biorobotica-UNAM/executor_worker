@@ -39,6 +39,8 @@ int main(int argc, char** argv)
     std::string recognized_speech;
     bool person = false;
     bool finished = false;
+    static std::string interactionCommandsGrammar("help_me_carry_interaction_commands.json");
+	static std::string navigationCommandsGrammar("help_me_carry_navigation_commands.json");
 
     while (rclcpp::ok() && !finished)
     {
@@ -60,7 +62,7 @@ int main(int argc, char** argv)
                 if(person == true)
                 {
                     hri->Say("Say, Justina follow me, when you are ready");
-                    recognized_speech = hri->Listen("help_me_carry.json");
+                    recognized_speech = hri->Listen("help_me_carry_navigation_commands.json");
                     std::cout << recognized_speech << std::endl;
                     if(recognized_speech == "justina follow me" || recognized_speech == "robot follow me" || recognized_speech == "follow me")
                     {
@@ -85,7 +87,7 @@ int main(int argc, char** argv)
                     hri->Say("I lost you, please stand infront of me");
                     state = SM_FIND_PERSON;
                 }
-                recognized_speech = hri->Listen("help_me_carry.json");
+                recognized_speech = hri->Listen("help_me_carry_navigation_commands.json");
                 std::cout << recognized_speech << std::endl;
                 if (recognized_speech == "justina we arrived" || recognized_speech == "robot we arrived"  || recognized_speech == "we arrived") 
                 {
@@ -97,7 +99,7 @@ int main(int argc, char** argv)
             case SM_CONFIRM_ARRIVAL:
                 std::cout << "[SM_CONFIRM_ARRIVAL]" << std::endl;
                 hri->Say("Have we arrived? Answer, Justina yes, or, Justina no");
-                recognized_speech = hri->Listen("help_me_carry.json");
+                recognized_speech = hri->Listen("help_me_carry_interaction_commands.json");
                 std::cout << recognized_speech << std::endl;
                 if(recognized_speech == "justina yes" || recognized_speech == "robot yes" || recognized_speech == "yes")
                 {
@@ -112,7 +114,7 @@ int main(int argc, char** argv)
             case SM_FIND_BAG:
                 std::cout << "[SM_FIND_BAG]" << std::endl;
                 hri->Say("Point at the bag you would like me to carry. Then say, Justina yes");
-                recognized_speech = hri->Listen("help_me_carry.json");
+                recognized_speech = hri->Listen("help_me_carry_interaction_commands.json");
                 std::cout << recognized_speech << std::endl;
                 if(recognized_speech == "justina yes" || recognized_speech == "robot yes" || recognized_speech == "yes")
                 {
@@ -126,7 +128,7 @@ int main(int argc, char** argv)
                 hardware->MoveHead(0.0,0.0);
                 manipulation->MoveArmTo("pointing_right");
                 hri->Say("Are you pointing at that bag? Answer, Justina yes, or, Justina no");
-                recognized_speech = hri->Listen("help_me_carry.json");
+                recognized_speech = hri->Listen("help_me_carry_interaction_commands.json");
                 std::cout << recognized_speech << std::endl;
                 if(recognized_speech == "justina yes" || recognized_speech == "robot yes" || recognized_speech == "yes")
                 {
@@ -144,7 +146,7 @@ int main(int argc, char** argv)
                 manipulation->MoveArmTo("take");
                 hardware->OpenGripper();
                 hri->Say("Place the bag in my hand. Say, Justina yes, once it is safe to close it");
-                recognized_speech = hri->Listen("help_me_carry.json");
+                recognized_speech = hri->Listen("help_me_carry_interaction_commands.json");
                 std::cout << recognized_speech << std::endl;
                 if(recognized_speech == "justina yes" || recognized_speech == "robot yes" || recognized_speech == "yes")
                 {
