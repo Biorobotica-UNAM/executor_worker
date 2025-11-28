@@ -13,6 +13,7 @@
   <depend>nlohmann_json</depend>
   <depend>vosk_speech_recognition</depend>
   <depend>hri_tools</depend>
+  <depend>hardware_tools</depend>
   <depend>navigation_tools</depend>
   <depend>service</depend>
 

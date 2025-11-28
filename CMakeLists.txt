@@ -9,9 +9,8 @@ find_package(std_msgs REQUIRED)
 find_package(listener_interfaces REQUIRED)
 find_package(known_locations_interfaces REQUIRED)
 find_package(hri_tools REQUIRED)
+find_package(hardware_tools REQUIRED)
 find_package(navigation_tools REQUIRED)
-#find_package(geometry_msgs REQUIRED)
-#find_package(robotino_msgs REQUIRED)
 find_package(service REQUIRED)
 
 include_directories(
@@ -21,6 +20,7 @@ include_directories(
   ${listener_interfaces_INCLUDE_DIRS}
   ${known_locations_interfaces_INCLUDE_DIRS}
   ${hri_tools_INCLUDE_DIRS}
+  ${hardware_tools_INCLUDE_DIRS}
   ${navigation_tools_INCLUDE_DIRS}
   ${service_INCLUDE_DIRS}
 )
@@ -36,6 +36,7 @@ ament_target_dependencies(robot_inspection
   listener_interfaces
   known_locations_interfaces
   hri_tools
+  hardware_tools
   navigation_tools
   service
 )
@@ -46,6 +47,7 @@ ament_target_dependencies(demo
   listener_interfaces
   known_locations_interfaces
   hri_tools
+  hardware_tools
   navigation_tools
   service
 )
@@ -56,6 +58,7 @@ ament_target_dependencies(help_me_carry
   listener_interfaces
   known_locations_interfaces
   hri_tools
+  hardware_tools
   navigation_tools
   service
 )

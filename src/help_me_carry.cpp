@@ -6,7 +6,7 @@
 #include "hri_tools/HRI.hpp"
 #include "hardware_tools/Hardware.hpp"
 #include "navigation_tools/Navigation.hpp"
-#include "vision_tools/Vision.hpp"
+//#include "vision_tools/Vision.hpp"
 
 enum SMState
 {
@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     auto hri = std::make_shared<HRI>(node);
     auto hardware = std::make_shared<Hardware>(node);
     auto navigation = std::make_shared<Navigation>(node);
-    auto vision = std::make_shared<Vision>(node);
+    //auto vision = std::make_shared<Vision>(node);
 
     rclcpp::Rate loop(10);
     SMState state = SM_START_TASK;
@@ -118,7 +118,7 @@ int main(int argc, char** argv)
 
             case SM_CONFIRM_BAG:
                 std::cout << "[SM_CONFIRM_BAG]" << std::endl;
-                vision->FindPointingHand();
+                //vision->FindPointingHand();
                 hardware->MoveHead(0.0,0.0);
                 hardware->MoveArmTo("pointing_right");
                 hri->Say("Are you pointing at that bag? Answer, Justina yes, or, Justina no");
