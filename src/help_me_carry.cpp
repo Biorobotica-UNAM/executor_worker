@@ -55,7 +55,8 @@ int main(int argc, char** argv)
 
             case SM_FIND_PERSON:
                 std::cout << "[SM_FIND_PERSON]" << std::endl;
-                person = hri->FindPerson();
+                //person = hri->FindPerson();
+                person = true;
                 if(person == true)
                 {
                     hri->Say("Say, Justina follow me, when you are ready");
@@ -75,11 +76,12 @@ int main(int argc, char** argv)
 
             case SM_FOLLOW_OPERATOR:
                 std::cout << "[SM_FOLLOW_OPERATOR]" << std::endl;
-                hri->FollowPerson(true);
-                person = hri->FindPerson();
+                //hri->FollowPerson(true);
+                //person = hri->FindPerson();
+                person = true;
                 if(person == false)
                 {
-                    hri->FollowPerson(false);
+                    //hri->FollowPerson(false);
                     hri->Say("I lost you, please stand infront of me");
                     state = SM_FIND_PERSON;
                 }
@@ -87,7 +89,7 @@ int main(int argc, char** argv)
                 std::cout << recognized_speech << std::endl;
                 if (recognized_speech == "justina we arrived" || recognized_speech == "robot we arrived"  || recognized_speech == "we arrived") 
                 {
-                    hri->FollowPerson(false);
+                    //hri->FollowPerson(false);
                     state = SM_CONFIRM_ARRIVAL;
                 }
                 break;
