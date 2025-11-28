@@ -14,7 +14,9 @@ find_package(talker_interfaces REQUIRED)
 find_package(known_locations_interfaces REQUIRED)
 find_package(hri_tools REQUIRED)
 find_package(hardware_tools REQUIRED)
+find_package(manipulation_tools REQUIRED)
 find_package(navigation_tools REQUIRED)
+find_package(manipulation_planner REQUIRED)
 find_package(service REQUIRED)
 
 include_directories(
@@ -29,7 +31,9 @@ include_directories(
   ${known_locations_interfaces_INCLUDE_DIRS}
   ${hri_tools_INCLUDE_DIRS}
   ${hardware_tools_INCLUDE_DIRS}
+  ${manipulation_tools_INCLUDE_DIRS}
   ${navigation_tools_INCLUDE_DIRS}
+  ${manipulation_planner_INCLUDE_DIRS}
   ${service_INCLUDE_DIRS}
 )
 
@@ -46,7 +50,9 @@ ament_target_dependencies(robot_inspection
   known_locations_interfaces
   hri_tools
   hardware_tools
+  manipulation_tools
   navigation_tools
+  manipulation_planner
   service
 )
 
@@ -58,7 +64,9 @@ ament_target_dependencies(demo
   known_locations_interfaces
   hri_tools
   hardware_tools
+  manipulation_tools
   navigation_tools
+  manipulation_planner
   service
 )
 
@@ -73,7 +81,9 @@ ament_target_dependencies(help_me_carry
   known_locations_interfaces
   hri_tools
   hardware_tools
+  manipulation_tools
   navigation_tools
+  manipulation_planner
   service
 )
 
