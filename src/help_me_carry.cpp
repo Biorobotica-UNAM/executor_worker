@@ -5,6 +5,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "hri_tools/HRI.hpp"
 #include "hardware_tools/Hardware.hpp"
+#include "manipulation_tools/Manipulation.hpp"
 #include "navigation_tools/Navigation.hpp"
 //#include "vision_tools/Vision.hpp"
 
@@ -29,6 +30,7 @@ int main(int argc, char** argv)
 
     auto hri = std::make_shared<HRI>(node);
     auto hardware = std::make_shared<Hardware>(node);
+    auto manipulation = std::make_shared<Manipulation>(node);
     auto navigation = std::make_shared<Navigation>(node);
     //auto vision = std::make_shared<Vision>(node);
 
@@ -45,7 +47,7 @@ int main(int argc, char** argv)
             case SM_START_TASK:
                 std::cout << "[SM_START_TASK]" << std::endl;
                 hardware->MoveHead(0.0,0.0);
-                hardware->MoveArmTo("neutral");
+                manipulation->MoveArmTo("neutral");
                 hardware->RelaxGripper();
                 hri->Say("My name is Justina. I am ready for help me carry task");
                 state = SM_FIND_PERSON;
@@ -120,7 +122,7 @@ int main(int argc, char** argv)
                 std::cout << "[SM_CONFIRM_BAG]" << std::endl;
                 //vision->FindPointingHand();
                 hardware->MoveHead(0.0,0.0);
-                hardware->MoveArmTo("pointing_right");
+                manipulation->MoveArmTo("pointing_right");
                 hri->Say("Are you pointing at that bag? Answer, Justina yes, or, Justina no");
                 recognized_speech = hri->Listen("help_me_carry.json");
                 std::cout << recognized_speech << std::endl;
@@ -137,7 +139,7 @@ int main(int argc, char** argv)
             case SM_TAKE_BAG:
                 std::cout << "[SM_TAKE_BAG]" << std::endl;
                 hardware->MoveHead(0.0,0.0);
-                hardware->MoveArmTo("take");
+                manipulation->MoveArmTo("take");
                 hardware->OpenGripper();
                 hri->Say("Place the bag in my hand. Say, Justina yes, once it is safe to close it");
                 recognized_speech = hri->Listen("help_me_carry.json");
@@ -159,7 +161,7 @@ int main(int argc, char** argv)
             case SM_DROP_BAG:
                 std::cout << "[SM_DROP_BAG]" << std::endl;
                 hardware->MoveHead(0.0,0.0);
-                hardware->MoveArmTo("drop");
+                manipulation->MoveArmTo("drop");
                 hardware->OpenGripper();
                 state = SM_FINISH_TASK;
                 break;
