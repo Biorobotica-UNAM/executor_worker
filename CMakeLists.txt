@@ -7,6 +7,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(listener_interfaces REQUIRED)
+find_package(talker_interfaces REQUIRED)
 find_package(known_locations_interfaces REQUIRED)
 find_package(hri_tools REQUIRED)
 find_package(hardware_tools REQUIRED)
@@ -18,6 +19,7 @@ include_directories(
   ${rclcpp_INCLUDE_DIRS}
   ${std_msgs_INCLUDE_DIRS}
   ${listener_interfaces_INCLUDE_DIRS}
+  ${talker_interfaces_INCLUDE_DIRS}
   ${known_locations_interfaces_INCLUDE_DIRS}
   ${hri_tools_INCLUDE_DIRS}
   ${hardware_tools_INCLUDE_DIRS}
@@ -34,6 +36,7 @@ ament_target_dependencies(robot_inspection
   rclcpp
   std_msgs
   listener_interfaces
+  talker_interfaces
   known_locations_interfaces
   hri_tools
   hardware_tools
@@ -45,6 +48,7 @@ ament_target_dependencies(demo
   rclcpp
   std_msgs
   listener_interfaces
+  talker_interfaces
   known_locations_interfaces
   hri_tools
   hardware_tools
@@ -56,6 +60,7 @@ ament_target_dependencies(help_me_carry
   rclcpp
   std_msgs
   listener_interfaces
+  talker_interfaces
   known_locations_interfaces
   hri_tools
   hardware_tools
