@@ -51,6 +51,7 @@ int main(int argc, char** argv)
                 hardware->MoveHead(0.0,0.0);
                 manipulation->MoveArmTo("neutral");
                 hardware->RelaxGripper();
+                navigation->GoTo("door");
                 hri->Say("My name is Justina. I am ready for help me carry task");
                 state = SM_FIND_PERSON;
                 break;
@@ -79,6 +80,7 @@ int main(int argc, char** argv)
             case SM_FOLLOW_OPERATOR:
                 std::cout << "[SM_FOLLOW_OPERATOR]" << std::endl;
                 hri->FollowPerson(true);
+                navigation->GoTo("seat_place_3");
                 //person = hri->FindPerson();
                 person = true;
                 if(person == false)
@@ -126,7 +128,7 @@ int main(int argc, char** argv)
                 std::cout << "[SM_CONFIRM_BAG]" << std::endl;
                 //vision->FindPointingHand();
                 hardware->MoveHead(0.0,0.0);
-                manipulation->MoveArmTo("pointing_right");
+                manipulation->MoveArmTo("drop");
                 hri->Say("Are you pointing at that bag? Answer, Justina yes, or, Justina no");
                 recognized_speech = hri->Listen("help_me_carry_interaction_commands.json");
                 std::cout << recognized_speech << std::endl;
@@ -158,7 +160,7 @@ int main(int argc, char** argv)
             case SM_NAVIGATE_TO_START:
                 std::cout << "[SM_NAVIGATE_TO_START]" << std::endl;
                 hri->Say("I will navigate to my starting point");
-                navigation->GoTo("door");
+                navigation->GoTo("beverage_area");
                 state = SM_DROP_BAG;
                 break;
 
