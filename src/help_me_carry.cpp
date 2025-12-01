@@ -48,10 +48,11 @@ int main(int argc, char** argv)
         {
             case SM_START_TASK:
                 std::cout << "[SM_START_TASK]" << std::endl;
+                rclcpp::sleep_for(std::chrono::seconds(5));
                 hardware->MoveHead(0.0,0.0);
                 manipulation->MoveArmTo("neutral");
                 hardware->RelaxGripper();
-                navigation->GoTo("door");
+                //navigation->GoTo("door");
                 hri->Say("My name is Justina. I am ready for help me carry task");
                 state = SM_FIND_PERSON;
                 break;
@@ -80,7 +81,7 @@ int main(int argc, char** argv)
             case SM_FOLLOW_OPERATOR:
                 std::cout << "[SM_FOLLOW_OPERATOR]" << std::endl;
                 hri->FollowPerson(true);
-                navigation->GoTo("seat_place_3");
+                navigation->GoTo("carry");
                 //person = hri->FindPerson();
                 person = true;
                 if(person == false)
@@ -129,7 +130,7 @@ int main(int argc, char** argv)
                 //vision->FindPointingHand();
                 hardware->MoveHead(0.0,0.0);
                 manipulation->MoveArmTo("drop");
-                hri->Say("Are you pointing at that bag? Answer, Justina yes, or, Justina no");
+                hri->Say("Are you pointing at the bag on your left? Answer, Justina yes, or, Justina no");
                 recognized_speech = hri->Listen("help_me_carry_interaction_commands.json");
                 std::cout << recognized_speech << std::endl;
                 if(recognized_speech == "justina yes" || recognized_speech == "robot yes" || recognized_speech == "yes")
@@ -160,7 +161,7 @@ int main(int argc, char** argv)
             case SM_NAVIGATE_TO_START:
                 std::cout << "[SM_NAVIGATE_TO_START]" << std::endl;
                 hri->Say("I will navigate to my starting point");
-                navigation->GoTo("beverage_area");
+                navigation->GoTo("door");
                 state = SM_DROP_BAG;
                 break;
 
