@@ -10,6 +10,17 @@
 
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
+  <depend>rclcpp_action</depend>
+
+  <depend>tf2_ros</depend>
+  <depend>sensor_msgs</depend>
+  <depend>trajectory_msgs</depend>
+
+  <depend>listener_interfaces</depend>
+  <depend>talker_interfaces</depend>
+  <depend>executor_interfaces</depend>
+  <depend>known_locations_interfaces</depend>
+
   <depend>nlohmann_json</depend>
   <depend>vosk_speech_recognition</depend>
   <depend>hri_tools</depend>
