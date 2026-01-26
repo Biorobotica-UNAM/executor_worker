@@ -14,12 +14,13 @@ find_package(listener_interfaces REQUIRED)
 find_package(executor_interfaces REQUIRED)
 find_package(talker_interfaces REQUIRED)
 find_package(known_locations_interfaces REQUIRED)
+find_package(clips_interfaces REQUIRED)
 find_package(hri_tools REQUIRED)
 find_package(hardware_tools REQUIRED)
 find_package(manipulation_tools REQUIRED)
 find_package(navigation_tools REQUIRED)
+find_package(planning_tools REQUIRED)
 find_package(manipulation_planner REQUIRED)
-find_package(service REQUIRED)
 
 include_directories(
   include
@@ -31,12 +32,13 @@ include_directories(
   ${listener_interfaces_INCLUDE_DIRS}
   ${talker_interfaces_INCLUDE_DIRS}
   ${known_locations_interfaces_INCLUDE_DIRS}
+  ${clips_interfaces_INCLUDE_DIRS}
   ${hri_tools_INCLUDE_DIRS}
   ${hardware_tools_INCLUDE_DIRS}
   ${manipulation_tools_INCLUDE_DIRS}
   ${navigation_tools_INCLUDE_DIRS}
-  ${manipulation_planner_INCLUDE_DIRS}
-  ${service_INCLUDE_DIRS}
+  ${planning_tools_INCLUDE_DIRS}
+  ${manipulation_planner_INCLUDE_DIRS}  
 )
 
 add_executable(robot_inspection src/robot_inspection.cpp)
@@ -52,12 +54,13 @@ ament_target_dependencies(robot_inspection
   talker_interfaces
   known_locations_interfaces
   executor_interfaces
+  clips_interfaces
   hri_tools
   hardware_tools
   manipulation_tools
   navigation_tools
-  manipulation_planner
-  service
+  planning_tools
+  manipulation_planner  
 )
 
 ament_target_dependencies(demo
@@ -66,12 +69,13 @@ ament_target_dependencies(demo
   listener_interfaces
   talker_interfaces
   known_locations_interfaces
+  clips_interfaces
   hri_tools
   hardware_tools
   manipulation_tools
   navigation_tools
+  planning_tools
   manipulation_planner
-  service
 )
 
 ament_target_dependencies(help_me_carry
@@ -83,12 +87,13 @@ ament_target_dependencies(help_me_carry
   listener_interfaces
   talker_interfaces
   known_locations_interfaces
+  clips_interfaces
   hri_tools
   hardware_tools
   manipulation_tools
   navigation_tools
+  planning_tools
   manipulation_planner
-  service
 )
 
 ament_target_dependencies(tasks_node
@@ -99,12 +104,13 @@ ament_target_dependencies(tasks_node
   talker_interfaces
   known_locations_interfaces
   executor_interfaces
+  clips_interfaces
   hri_tools
   hardware_tools
   manipulation_tools
   navigation_tools
+  planning_tools
   manipulation_planner
-  service
 )
 
 install(TARGETS robot_inspection demo help_me_carry tasks_node
