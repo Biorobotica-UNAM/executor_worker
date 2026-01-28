@@ -2,7 +2,7 @@
 #include <string>
 #include <thread>
 #include <atomic>
-#include <set>  // <--- ¡ESTA ERA LA QUE FALTABA!
+#include <set>
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
@@ -36,7 +36,8 @@ class TaskNode : public rclcpp::Node
     void init_tools()
     {
       nav_ = std::make_shared<Navigation>(shared_from_this());
-      hri_ = std::make_shared<HRI>(shared_from_this());
+      aux_node_ = rclcpp::Node::make_shared("task_node_hri_client");
+      hri_ = std::make_shared<HRI>(aux_node_); 
     }
 
   private:
@@ -44,10 +45,7 @@ class TaskNode : public rclcpp::Node
     const rclcpp_action::GoalUUID & /*uuid*/,
     std::shared_ptr<const ExecuteTask::Goal> goal)
     {
-      // Validación mínima: solo aceptamos goto, speak y listen
       const auto & step = goal->task;
-      
-      // Necesitas #include <set> para que esto funcione
       std::set<std::string> valid_actions = {"goto", "speak", "listen"};
 
       if (valid_actions.find(step.action) == valid_actions.end())
@@ -56,14 +54,12 @@ class TaskNode : public rclcpp::Node
         return rclcpp_action::GoalResponse::REJECT;
       }
 
-      // Validaciones básicas de argumentos
       if (step.action == "goto" && (step.args.empty() || step.args[0].empty())) {
         return rclcpp_action::GoalResponse::REJECT;
       }
       if (step.action == "speak" && step.args.empty()) {
          return rclcpp_action::GoalResponse::REJECT;
       }
-      // 'listen' es flexible con argumentos
 
       return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
     }
@@ -73,7 +69,6 @@ class TaskNode : public rclcpp::Node
     {
       (void)goal_handle;
       cancel_requested_.store(true);
-      RCLCPP_WARN(get_logger(), "Cancel requested for current task.");
       return rclcpp_action::CancelResponse::ACCEPT;
     }
 
@@ -88,20 +83,17 @@ class TaskNode : public rclcpp::Node
 
       const auto goal = goal_handle->get_goal();
       const auto step = goal->task;
-
       const uint32_t step_id = step.step_id;
+      
       bool success = false;
       std::string message = "";
 
       RCLCPP_INFO(get_logger(), "Executing %s (step_id=%u)...", step.action.c_str(), step_id);
 
-      // --- LOGICA DE ACCIONES ---
-      
       if (step.action == "goto") 
       {
           std::string location = step.args[0];
           publish_feedback(goal_handle, step_id, "Moving to " + location);
-          
           success = nav_->GoTo(location); 
           message = success ? ("Arrived to " + location) : ("Failed goto " + location);
       }
@@ -109,23 +101,18 @@ class TaskNode : public rclcpp::Node
       {
           std::string text_to_say = step.args[0];
           publish_feedback(goal_handle, step_id, "Speaking: " + text_to_say);
-
-          // Usamos hri_ -> Say()
+          
           success = hri_->Say(text_to_say);
           
           message = success ? "Finished speaking" : "Failed to speak";
       }
       else if (step.action == "listen")
       {
-          // Si el usuario no mandó argumentos, mandamos gramática vacía ""
           std::string grammar = step.args.empty() ? "" : step.args[0];
-          
-          publish_feedback(goal_handle, step_id, "Listening (grammar: " + grammar + ")...");
+          publish_feedback(goal_handle, step_id, "Listening...");
 
-          // Usamos hri_ -> Listen()
           std::string heard_text = hri_->Listen(grammar);
           
-          // Asumimos éxito si escuchó ALGO (string no vacio)
           if (!heard_text.empty()) {
               success = true;
               message = "Heard: " + heard_text;
@@ -136,19 +123,15 @@ class TaskNode : public rclcpp::Node
           }
       }
 
-      // --- Verificación de Cancelación ---
       if (goal_handle->is_canceling() || cancel_requested_.load()) {
         auto result = std::make_shared<ExecuteTask::Result>();
         result->result.step_id = step_id;
         result->result.status = executor_interfaces::msg::TaskResult::ABORTED;
         result->result.message = "Canceled: " + step.action;
-
         goal_handle->canceled(result);
-        RCLCPP_WARN(get_logger(), "Task canceled (step_id=%u).", step_id);
         return;
       }
 
-      // --- Resultado Final ---
       auto result = std::make_shared<ExecuteTask::Result>();
       result->result.step_id = step_id;
       result->result.message = message;
@@ -177,6 +160,8 @@ class TaskNode : public rclcpp::Node
 
     std::shared_ptr<Navigation> nav_;
     std::shared_ptr<HRI> hri_;
+    rclcpp::Node::SharedPtr aux_node_; 
+
     std::atomic<bool> cancel_requested_{false};
   };
 
