@@ -67,7 +67,7 @@ int main(int argc, char **argv)
             {
                 std::cout << "[SM_NAVIGATE_TO_ENTRANCE]" << std::endl;
 
-                navigation->GoTo("door");
+                navigation->GoTo("entrance");
 
                // planning_result = planning->requestInstruction();
                // if (planning_result.size() >= 3)
@@ -138,7 +138,7 @@ int main(int argc, char **argv)
                 std::cout << "[SM_NAVIGATE_TO_EXIT]" << std::endl;
 
                 hri->Say("I will navigate to the exit point");
-                navigation->GoTo("door");
+                navigation->GoTo("entrance");
 
                 state = SM_FINISH_TASK;
                 break;
