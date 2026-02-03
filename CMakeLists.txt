@@ -17,7 +17,8 @@ find_package(hardware_tools REQUIRED)
 find_package(manipulation_tools REQUIRED)
 find_package(navigation_tools REQUIRED)
 find_package(manipulation_planner REQUIRED)
-find_package(service REQUIRED)
+find_package(clips_interfaces REQUIRED)
+find_package(planning_tools REQUIRED)
 
 include_directories(
   include
@@ -33,8 +34,9 @@ include_directories(
   ${hardware_tools_INCLUDE_DIRS}
   ${manipulation_tools_INCLUDE_DIRS}
   ${navigation_tools_INCLUDE_DIRS}
+  ${clips_interfaces_INCLUDE_DIRS}
+  ${planning_tools_INCLUDE_DIRS}
   ${manipulation_planner_INCLUDE_DIRS}
-  ${service_INCLUDE_DIRS}
 )
 
 add_executable(robot_inspection src/robot_inspection.cpp)
@@ -53,8 +55,8 @@ ament_target_dependencies(robot_inspection
   hardware_tools
   manipulation_tools
   navigation_tools
+  clips_interfaces
   manipulation_planner
-  service
 )
 
 ament_target_dependencies(demo
@@ -67,8 +69,9 @@ ament_target_dependencies(demo
   hardware_tools
   manipulation_tools
   navigation_tools
+  planning_tools
+  clips_interfaces
   manipulation_planner
-  service
 )
 
 ament_target_dependencies(help_me_carry
@@ -82,10 +85,10 @@ ament_target_dependencies(help_me_carry
   known_locations_interfaces
   hri_tools
   hardware_tools
+  clips_interfaces
   manipulation_tools
   navigation_tools
   manipulation_planner
-  service
 )
 
 ament_target_dependencies(panHead
@@ -99,8 +102,6 @@ ament_target_dependencies(panHead
   known_locations_interfaces
   hri_tools
   hardware_tools
-  vision_tools
-  service
 )
 
 install(TARGETS 

@@ -5,7 +5,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "hri_tools/HRI.hpp"
 #include "hardware_tools/Hardware.hpp"
-#include "vision_tools/Vision.hpp"
+//#include "vision_tools/Vision.hpp"
 
 enum SMState
 {
@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 
     auto hri = std::make_shared<HRI>(node);
     auto hardware = std::make_shared<Hardware>(node);
-    auto vision = std::make_shared<Vision>(node);
+    //auto vision = std::make_shared<Vision>(node);
 
     rclcpp::Rate loop(10);
     SMState state = SM_START_TASK;
@@ -61,11 +61,11 @@ int main(int argc, char** argv)
     while (rclcpp::ok() && !finished)
     {
         // -------- VISIÓN (prioridad máxima) --------
-        if (vision->PersonDetected())
-        {
-            std::cout << "[PERSON DETECTED]" << std::endl;
-            state = FOUND;
-        }
+        //if (vision->PersonDetected())
+        //{
+        //    std::cout << "[PERSON DETECTED]" << std::endl;
+        //    state = FOUND;
+        //}
 
         switch (state)
         {
