@@ -40,6 +40,7 @@ include_directories(
 add_executable(robot_inspection src/robot_inspection.cpp)
 add_executable(demo src/demo.cpp)
 add_executable(help_me_carry src/help_me_carry.cpp)
+add_executable(panHead src/panHead.cpp)
 
 
 ament_target_dependencies(robot_inspection
@@ -87,7 +88,26 @@ ament_target_dependencies(help_me_carry
   service
 )
 
-install(TARGETS robot_inspection demo help_me_carry
+ament_target_dependencies(panHead
+  rclcpp
+  std_msgs
+  sensor_msgs
+  trajectory_msgs
+  tf2_ros
+  listener_interfaces
+  talker_interfaces
+  known_locations_interfaces
+  hri_tools
+  hardware_tools
+  vision_tools
+  service
+)
+
+install(TARGETS 
+  robot_inspection 
+  demo 
+  help_me_carry 
+  panHead
   DESTINATION lib/${PROJECT_NAME}
 )
 
