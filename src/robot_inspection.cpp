@@ -75,6 +75,7 @@ int main(int argc, char **argv)
                //               << planning_result[2] << std::endl;
 
                 state = SM_WAIT_FOR_DOOR;
+                std::cout << "Changing to wait_for_door" << std::endl;
                 break;
             }
 
