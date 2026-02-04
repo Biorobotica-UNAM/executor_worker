@@ -52,7 +52,7 @@ int main(int argc, char** argv)
     
     //const double deg_p_bit = 
 
-    const double STEP = 1;   // bits por iteración. Modificar para igualar la velocidad real de los motores
+    const double STEP = 3;   // bits por iteración. Modificar para igualar la velocidad real de los motores
 
     double pan = PAN_ZERO;
     double tilt = TILT_ZERO;
