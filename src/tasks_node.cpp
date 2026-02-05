@@ -46,7 +46,7 @@ class TaskNode : public rclcpp::Node
     std::shared_ptr<const ExecuteTask::Goal> goal)
     {
       const auto & step = goal->task;
-      std::set<std::string> valid_actions = {"goto", "speak", "listen"};
+      std::set<std::string> valid_actions = {"goto", "say", "listen"};
 
       if (valid_actions.find(step.action) == valid_actions.end())
       {
@@ -57,7 +57,7 @@ class TaskNode : public rclcpp::Node
       if (step.action == "goto" && (step.args.empty() || step.args[0].empty())) {
         return rclcpp_action::GoalResponse::REJECT;
       }
-      if (step.action == "speak" && step.args.empty()) {
+      if (step.action == "say" && step.args.empty()) {
          return rclcpp_action::GoalResponse::REJECT;
       }
 
@@ -97,14 +97,14 @@ class TaskNode : public rclcpp::Node
           success = nav_->GoTo(location); 
           message = success ? ("Arrived to " + location) : ("Failed goto " + location);
       }
-      else if (step.action == "speak")
+      else if (step.action == "say")
       {
           std::string text_to_say = step.args[0];
-          publish_feedback(goal_handle, step_id, "Speaking: " + text_to_say);
+          publish_feedback(goal_handle, step_id, "saying: " + text_to_say);
           
           success = hri_->Say(text_to_say);
           
-          message = success ? "Finished speaking" : "Failed to speak";
+          message = success ? "Finished saying" : "Failed to say";
       }
       else if (step.action == "listen")
       {
