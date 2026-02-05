@@ -32,31 +32,24 @@ int main(int argc, char** argv)
     SMState state = SM_START_TASK;
     bool finished = false;
 
-    // ---------- Límites en bits ----------
-    const double PAN_MIN  = 1024;
-    const double PAN_ZERO = 2057;
-    const double PAN_MAX  = 3091;
+    // ---------- Límites en grados  ----------
+    const double PAN_LEFT  = 45;
+    const double PAN_ZERO = 0;
+    const double PAN_RIGHT  = -45;
 
-    const double TILT_MIN  = 3100;
-    const double TILT_ZERO = 3526;
-    const double TILT_MAX  = 3794;
-
-    // ---------- Límites en grados (referencia) ----------
-    const double PAN_MIN_DEG  = 90;
-    const double PAN_ZERO_DEG = 0;
-    const double PAN_MAX_DEG  = -90;
-
-    const double TILT_MIN_DEG  = -37;
-    const double TILT_ZERO_DEG = 0;
-    const double TILT_MAX_DEG  = 24;
+    const double TILT_UP  = -37;
+    const double TILT_ZERO = 0;
+    const double TILT_DOWN  = 24;
     
     //const double deg_p_bit = 
 
-    const double STEP = 10;   // bits por iteración. Modificar para igualar la velocidad real de los motores
+    //const double STEP = 10;   // bits por iteración. Modificar para igualar la velocidad real de los motores
 
     double pan = PAN_ZERO;
     double tilt = TILT_ZERO;
     int count = 0;
+    int loops = 5;
+    int loop_counter = 0;
 
     while (rclcpp::ok() && !finished)
     {
@@ -70,7 +63,7 @@ int main(int argc, char** argv)
         switch (state)
         {
             case SM_START_TASK:
-                std::cout << "[START]" << std::endl;
+                std::cout << "[START] pan=" << pan << " tilt=" << tilt << std::endl;
                 pan = PAN_ZERO;
                 tilt = TILT_ZERO;
                 count = 0;
@@ -79,84 +72,103 @@ int main(int argc, char** argv)
                 break;
 
             case MOVE_HEAD_RIGHT:
-                std::cout << "[MOVE_HEAD_RIGHT]" << std::endl;
-
-                pan -= STEP;
-                if (pan <= PAN_MIN)
+                std::cout << "[MOVE_HEAD_RIGHT] pan=" << pan << " tilt=" << tilt << std::endl;
+                //delay
+                if (loop_counter < loops)
                 {
-                    pan = PAN_MIN;
+                    loop_counter++;
+                    break;
+                }
+                loop_counter = 0;
+                //move head
+                pan -= 45;
+                if (pan <= -45)
+                {
                     state = MOVE_HEAD_DOWN;
                 }
                 hardware->MoveHead(pan, tilt);
                 break;
 
             case MOVE_HEAD_DOWN:
-                std::cout << "[MOVE_HEAD_DOWN]" << std::endl;
-
-                tilt += STEP;
-                if (tilt >= TILT_MAX)
+                std::cout << "[MOVE_HEAD_DOWN] pan=" << pan << " tilt=" << tilt << std::endl;
+                //delay
+                if (loop_counter < loops)
                 {
-                    tilt = TILT_MAX;
-                    state = MOVE_HEAD_LEFT;
+                    loop_counter++;
+                    break;
                 }
+                loop_counter = 0;
+                //move head
+                tilt = 24;
+                state = MOVE_HEAD_LEFT;
                 hardware->MoveHead(pan, tilt);
                 break;
 
             case MOVE_HEAD_LEFT:
-                std::cout << "[MOVE_HEAD_LEFT]" << std::endl;
-
-                pan += STEP;
-                if (pan >= PAN_MAX)
+                std::cout << "[MOVE_HEAD_LEFT] pan=" << pan << " tilt=" << tilt << std::endl;
+                //delay
+                if (loop_counter < loops)
                 {
-                    pan = PAN_MAX;
+                    loop_counter++;
+                    break;
+                }
+                loop_counter = 0;
+                //move head
+                pan += 45;
+                if (pan >= 45)
+                {
                     state = MOVE_HEAD_UP;
                 }
                 hardware->MoveHead(pan, tilt);
                 break;
 
             case MOVE_HEAD_UP:
-                std::cout << "[MOVE_HEAD_UP]" << std::endl;
-
-                tilt -= STEP;
-                if (tilt <= TILT_MIN)
+                std::cout << "[MOVE_HEAD_UP] pan=" << pan << " tilt=" << tilt << std::endl;
+                //delay
+                if (loop_counter < loops)
                 {
-                    tilt = TILT_MIN;
-                    state = MOVE_HEAD_RIGHT_2;
+                    loop_counter++;
+                    break;
                 }
+                loop_counter = 0;
+                //move head
+                tilt = 0;
+                state = MOVE_HEAD_RIGHT_2;
                 hardware->MoveHead(pan, tilt);
                 break;
 
             case MOVE_HEAD_RIGHT_2:
-                std::cout << "[MOVE_HEAD_RIGHT_2]" << std::endl;
-
-                pan -= STEP;
-
-                if (pan <= PAN_ZERO)   // tolerancia
+                std::cout << "[MOVE_HEAD_RIGHT_2] pan=" << pan << " tilt=" << tilt << std::endl;
+                //delay
+                if (loop_counter < loops)
                 {
-                    pan = PAN_ZERO;
-                    count++;
-
-                    if (count < 2)
-                    {
-                        state = MOVE_HEAD_RIGHT;   // inicia siguiente rutina
-                    }
-                    else
-                    {
-                        state = NOT_FOUND;
-                    }
+                    loop_counter++;
+                    break;
+                }
+                loop_counter = 0;
+                //ejecuta la rutina 2 veces
+                count++;
+                pan = 0;
+                if (count < 2)
+                {
+                    state = MOVE_HEAD_RIGHT;   // inicia siguiente rutina
+                }
+                else
+                {
+                    state = NOT_FOUND;
                 }
                 hardware->MoveHead(pan, tilt);
                 break;
 
             case FOUND:
-                std::cout << "[FOUND]" << std::endl;
+                std::cout << "[FOUND] pan=" << pan << " tilt=" << tilt << std::endl;
                 hardware->MoveHead(pan, tilt);
                 hri->Say("Person found");
                 finished = true;
                 break;
 
             case NOT_FOUND:
-                std::cout << "[NOT_FOUND]" << std::endl;
+                std::cout << "[NOT_FOUND] pan=" << pan << " tilt=" << tilt << std::endl;
                 hardware->MoveHead(PAN_ZERO, TILT_ZERO);
                 hri->Say("No person found");
                 finished = true;
