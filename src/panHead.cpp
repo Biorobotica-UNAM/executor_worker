@@ -33,20 +33,28 @@ int main(int argc, char** argv)
     bool finished = false;
 
     // ---------- Límites en grados  ----------
-    const double PAN_LEFT  = 45;
-    const double PAN_ZERO = 0;
-    const double PAN_RIGHT  = -45;
+    //const double PAN_LEFT  = 45;
+    //const double PAN_ZERO = 0;
+    //const double PAN_RIGHT  = -45;
 
-    const double TILT_UP  = -37;
-    const double TILT_ZERO = 0;
-    const double TILT_DOWN  = 24;
+    //const double TILT_UP  = -37;
+    //const double TILT_ZERO = 0;
+    //const double TILT_DOWN  = 24;
     
+    // ---------- Límites en radianes ----------
+    const double PAN_LEFT  =  0.785398;   //  45°
+    const double PAN_ZERO  =  0.0;        //   0°
+    const double PAN_RIGHT = -0.785398;   // -45°
+
+    const double TILT_UP   = -0.645772;   // -37°
+    const double TILT_ZERO =  0.0;        //   0°
+    const double TILT_DOWN =  0.418879;   //  24°
 
     double pan = PAN_ZERO;
     double tilt = TILT_ZERO;
     int count = 0;
     int loops = 30;
-    int loop_counter = 0;
+    int loop_counter = 30;
 
     while (rclcpp::ok() && !finished)
     {
@@ -78,8 +86,8 @@ int main(int argc, char** argv)
                 }
                 loop_counter = 0;
                 //move head
-                pan -= 45;
-                if (pan <= -45)
+                pan -= 0.785398;
+                if (pan <= -0.785398)
                 {
                     state = MOVE_HEAD_DOWN;
                 }
@@ -96,7 +104,7 @@ int main(int argc, char** argv)
                 }
                 loop_counter = 0;
                 //move head
-                tilt = 24;
+                tilt = 0.418879;
                 state = MOVE_HEAD_LEFT;
                 hardware->MoveHead(pan, tilt);
                 break;
@@ -111,8 +119,8 @@ int main(int argc, char** argv)
                 }
                 loop_counter = 0;
                 //move head
-                pan += 45;
-                if (pan >= 45)
+                pan += 0.785398;
+                if (pan >= 0.785398)
                 {
                     state = MOVE_HEAD_UP;
                 }
