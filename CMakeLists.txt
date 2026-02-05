@@ -133,7 +133,7 @@ ament_target_dependencies(panHead
 #  navigation_tools
 #  planning_tools
 #  manipulation_planner
-)
+#)
 
 install(TARGETS panHead # robot_inspection demo help_me_carry tasks_node panHead
   DESTINATION lib/${PROJECT_NAME}
