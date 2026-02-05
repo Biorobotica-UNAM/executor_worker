@@ -48,7 +48,7 @@ int main(int argc, char** argv)
     double pan = PAN_ZERO;
     double tilt = TILT_ZERO;
     int count = 0;
-    int loops = 5;
+    int loops = 50;
     int loop_counter = 0;
 
     while (rclcpp::ok() && !finished)
