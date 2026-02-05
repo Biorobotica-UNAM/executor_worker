@@ -5,7 +5,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "hri_tools/HRI.hpp"
 #include "hardware_tools/Hardware.hpp"
-//#include "vision_tools/Vision.hpp"
+#include "vision_tools/Vision.hpp"
 
 enum SMState
 {
@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 
     auto hri = std::make_shared<HRI>(node);
     auto hardware = std::make_shared<Hardware>(node);
-    //auto vision = std::make_shared<Vision>(node);
+    auto vision = std::make_shared<Vision>(node);
 
     rclcpp::Rate loop(10);
     SMState state = SM_START_TASK;
@@ -41,9 +41,6 @@ int main(int argc, char** argv)
     const double TILT_ZERO = 0;
     const double TILT_DOWN  = 24;
     
-    //const double deg_p_bit = 
-
-    //const double STEP = 10;   // bits por iteración. Modificar para igualar la velocidad real de los motores
 
     double pan = PAN_ZERO;
     double tilt = TILT_ZERO;
@@ -54,9 +51,9 @@ int main(int argc, char** argv)
     while (rclcpp::ok() && !finished)
     {
         // -------- VISIÓN (prioridad máxima) --------
-        //if (vision->PersonDetected())
+        //if (vision->detectByClass(apple, yolo))
         //{
-        //    std::cout << "[PERSON DETECTED]" << std::endl;
+        //    std::cout << "[OBJECT DETECTED]" << std::endl;
         //    state = FOUND;
         //}
 
