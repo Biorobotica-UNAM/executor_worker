@@ -43,78 +43,78 @@ include_directories(
   ${manipulation_planner_INCLUDE_DIRS}  
 )
 
-add_executable(robot_inspection src/robot_inspection.cpp)
-add_executable(demo src/demo.cpp)
-add_executable(help_me_carry src/help_me_carry.cpp)
-add_executable(panHead src/panHead.cpp)
+# add_executable(robot_inspection src/robot_inspection.cpp)
+# add_executable(demo src/demo.cpp)
+# add_executable(help_me_carry src/help_me_carry.cpp)
+# add_executable(panHead src/panHead.cpp)
 add_executable(tasks_node src/tasks_node.cpp)
 
 
-ament_target_dependencies(robot_inspection
-  rclcpp
-  std_msgs
-  listener_interfaces
-  talker_interfaces
-  known_locations_interfaces
-  executor_interfaces
-  clips_interfaces
-  manipulation_planner_interfaces
-  hri_tools
-  hardware_tools
-  manipulation_tools
-  navigation_tools
-  planning_tools
-  manipulation_planner  
-)
+# ament_target_dependencies(robot_inspection
+#   rclcpp
+#   std_msgs
+#   listener_interfaces
+#   talker_interfaces
+#   known_locations_interfaces
+#   executor_interfaces
+#   clips_interfaces
+#   manipulation_planner_interfaces
+#   hri_tools
+#   hardware_tools
+#   manipulation_tools
+#   navigation_tools
+#   planning_tools
+#   manipulation_planner  
+# )
 
-ament_target_dependencies(demo
-  rclcpp
-  std_msgs
-  listener_interfaces
-  talker_interfaces
-  known_locations_interfaces
-  clips_interfaces
-  manipulation_planner_interfaces
-  hri_tools
-  hardware_tools
-  manipulation_tools
-  navigation_tools
-  planning_tools
-  manipulation_planner
-)
+# ament_target_dependencies(demo
+#   rclcpp
+#   std_msgs
+#   listener_interfaces
+#   talker_interfaces
+#   known_locations_interfaces
+#   clips_interfaces
+#   manipulation_planner_interfaces
+#   hri_tools
+#   hardware_tools
+#   manipulation_tools
+#   navigation_tools
+#   planning_tools
+#   manipulation_planner
+# )
 
-ament_target_dependencies(help_me_carry
-  rclcpp
-  std_msgs
-  sensor_msgs
-  trajectory_msgs
-  tf2_ros
-  listener_interfaces
-  talker_interfaces
-  known_locations_interfaces
-  clips_interfaces
-  manipulation_planner_interfaces
-  hri_tools
-  hardware_tools
-  clips_interfaces
-  manipulation_tools
-  navigation_tools
-  planning_tools
-  manipulation_planner
-)
+# ament_target_dependencies(help_me_carry
+#   rclcpp
+#   std_msgs
+#   sensor_msgs
+#   trajectory_msgs
+#   tf2_ros
+#   listener_interfaces
+#   talker_interfaces
+#   known_locations_interfaces
+#   clips_interfaces
+#   manipulation_planner_interfaces
+#   hri_tools
+#   hardware_tools
+#   clips_interfaces
+#   manipulation_tools
+#   navigation_tools
+#   planning_tools
+#   manipulation_planner
+# )
 
-ament_target_dependencies(panHead
-  rclcpp
-  std_msgs
-  sensor_msgs
-  trajectory_msgs
-  tf2_ros
-  listener_interfaces
-  talker_interfaces
-  known_locations_interfaces
-  hri_tools
-  hardware_tools
-)
+# ament_target_dependencies(panHead
+#   rclcpp
+#   std_msgs
+#   sensor_msgs
+#   trajectory_msgs
+#   tf2_ros
+#   listener_interfaces
+#   talker_interfaces
+#   known_locations_interfaces
+#   hri_tools
+#   hardware_tools
+# )
 
 
 ament_target_dependencies(tasks_node
@@ -135,7 +135,7 @@ ament_target_dependencies(tasks_node
   manipulation_planner
 )
 
-install(TARGETS robot_inspection demo help_me_carry tasks_node panHead
+install(TARGETS tasks_node # robot_inspection demo help_me_carry tasks_node panHead
   DESTINATION lib/${PROJECT_NAME}
 )
 
