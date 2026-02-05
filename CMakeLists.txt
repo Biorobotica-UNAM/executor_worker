@@ -14,6 +14,7 @@ find_package(listener_interfaces REQUIRED)
 find_package(executor_interfaces REQUIRED)
 find_package(talker_interfaces REQUIRED)
 find_package(known_locations_interfaces REQUIRED)
+find_package(manipulation_planner_interfaces REQUIRED)
 find_package(clips_interfaces REQUIRED)
 find_package(hri_tools REQUIRED)
 find_package(hardware_tools REQUIRED)
@@ -32,6 +33,7 @@ include_directories(
   ${listener_interfaces_INCLUDE_DIRS}
   ${talker_interfaces_INCLUDE_DIRS}
   ${known_locations_interfaces_INCLUDE_DIRS}
+  ${manipulation_planner_interfaces_INCLUDE_DIRS}
   ${clips_interfaces_INCLUDE_DIRS}
   ${hri_tools_INCLUDE_DIRS}
   ${hardware_tools_INCLUDE_DIRS}
@@ -56,6 +58,7 @@ ament_target_dependencies(robot_inspection
   known_locations_interfaces
   executor_interfaces
   clips_interfaces
+  manipulation_planner_interfaces
   hri_tools
   hardware_tools
   manipulation_tools
@@ -71,6 +74,7 @@ ament_target_dependencies(demo
   talker_interfaces
   known_locations_interfaces
   clips_interfaces
+  manipulation_planner_interfaces
   hri_tools
   hardware_tools
   manipulation_tools
@@ -89,6 +93,7 @@ ament_target_dependencies(help_me_carry
   talker_interfaces
   known_locations_interfaces
   clips_interfaces
+  manipulation_planner_interfaces
   hri_tools
   hardware_tools
   clips_interfaces
@@ -121,6 +126,7 @@ ament_target_dependencies(tasks_node
   known_locations_interfaces
   executor_interfaces
   clips_interfaces
+  manipulation_planner_interfaces
   hri_tools
   hardware_tools
   manipulation_tools
