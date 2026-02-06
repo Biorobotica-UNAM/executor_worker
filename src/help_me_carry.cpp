@@ -50,7 +50,7 @@ int main(int argc, char** argv)
                 std::cout << "[SM_START_TASK]" << std::endl;
                 rclcpp::sleep_for(std::chrono::seconds(5));
                 hardware->MoveHead(0.0,0.0);
-                manipulation->MoveArmTo("neutral");
+                //manipulation->MoveArmTo("neutral");
                 hardware->RelaxGripper();
                 //navigation->GoTo("door");
                 hri->Say("My name is Justina. I am ready for help me carry task");
@@ -129,7 +129,7 @@ int main(int argc, char** argv)
                 std::cout << "[SM_CONFIRM_BAG]" << std::endl;
                 //vision->FindPointingHand();
                 hardware->MoveHead(0.0,0.0);
-                manipulation->MoveArmTo("drop");
+                //manipulation->MoveArmTo("drop");
                 hri->Say("Are you pointing at the bag on your left? Answer, Justina yes, or, Justina no");
                 recognized_speech = hri->Listen("help_me_carry_interaction_commands.json");
                 std::cout << recognized_speech << std::endl;
@@ -146,7 +146,7 @@ int main(int argc, char** argv)
             case SM_TAKE_BAG:
                 std::cout << "[SM_TAKE_BAG]" << std::endl;
                 hardware->MoveHead(0.0,0.0);
-                manipulation->MoveArmTo("take");
+                //manipulation->MoveArmTo("take");
                 hardware->OpenGripper();
                 hri->Say("Place the bag in my hand. Say, Justina yes, once it is safe to close it");
                 recognized_speech = hri->Listen("help_me_carry_interaction_commands.json");
@@ -168,7 +168,7 @@ int main(int argc, char** argv)
             case SM_DROP_BAG:
                 std::cout << "[SM_DROP_BAG]" << std::endl;
                 hardware->MoveHead(0.0,0.0);
-                manipulation->MoveArmTo("drop");
+                //manipulation->MoveArmTo("drop");
                 hardware->OpenGripper();
                 state = SM_FINISH_TASK;
                 break;
