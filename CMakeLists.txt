@@ -39,6 +39,7 @@ add_executable(tasks_node src/tasks_node.cpp)
 ament_target_dependencies(robot_inspection
   rclcpp
   std_msgs
+  sensor_msgs
   listener_interfaces
   talker_interfaces
   known_locations_interfaces
@@ -91,6 +92,7 @@ ament_target_dependencies(help_me_carry
 ament_target_dependencies(panHead
   rclcpp
   std_msgs
+  std_srvs
   sensor_msgs
   trajectory_msgs
   tf2_ros
