@@ -15,27 +15,27 @@
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-class TaskNode : public rclcpp::Node
+class TasksNode : public rclcpp::Node
 {
 public:
   using ExecuteTask = executor_interfaces::action::ExecuteTask;
   using GoalHandleExecuteTask =
     rclcpp_action::ServerGoalHandle<ExecuteTask>;
 
-  TaskNode()
-  : Node("task_node")
+  TasksNode()
+  : Node("tasks_node")
   {
     action_server_ = rclcpp_action::create_server<ExecuteTask>(
       this,
       "execute_task",
-      std::bind(&TaskNode::handle_goal, this, _1, _2),
-      std::bind(&TaskNode::handle_cancel, this, _1),
-      std::bind(&TaskNode::handle_accepted, this, _1)
+      std::bind(&TasksNode::handle_goal, this, _1, _2),
+      std::bind(&TasksNode::handle_cancel, this, _1),
+      std::bind(&TasksNode::handle_accepted, this, _1)
     );
 
     RCLCPP_INFO(
       get_logger(),
-      "task_node ready. Action server: /execute_task");
+      "tasks_node ready. Action server: /execute_task");
   }
 
   void init_tools()
@@ -84,7 +84,7 @@ private:
     const std::shared_ptr<GoalHandleExecuteTask> goal_handle)
   {
     std::thread{
-      std::bind(&TaskNode::execute, this, _1),
+      std::bind(&TasksNode::execute, this, _1),
       goal_handle
     }.detach();
   }
@@ -201,7 +201,7 @@ int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
 
-  auto node = std::make_shared<TaskNode>();
+  auto node = std::make_shared<TasksNode>();
   node->init_tools();
 
   rclcpp::spin(node);
