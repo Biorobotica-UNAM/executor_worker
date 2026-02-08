@@ -27,7 +27,7 @@ public:
   {
     action_server_ = rclcpp_action::create_server<ExecuteTask>(
       this,
-      "execute_task",
+      "/executor/execute_task",
       std::bind(&TasksNode::handle_goal, this, _1, _2),
       std::bind(&TasksNode::handle_cancel, this, _1),
       std::bind(&TasksNode::handle_accepted, this, _1)
