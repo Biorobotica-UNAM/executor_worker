@@ -35,7 +35,7 @@ public:
 
     RCLCPP_INFO(
       get_logger(),
-      "tasks_node ready. Action server: /execute_task");
+      "tasks_node ready. Action server: /executor/execute_task");
   }
 
   void init_tools()
@@ -83,95 +83,114 @@ private:
   void handle_accepted(
     const std::shared_ptr<GoalHandleExecuteTask> goal_handle)
   {
-    std::thread{
-      std::bind(&TasksNode::execute, this, _1),
+    std::thread(
+      &TasksNode::execute,
+      this,
       goal_handle
-    }.detach();
+    ).detach();
   }
 
   void execute(
     const std::shared_ptr<GoalHandleExecuteTask> goal_handle)
   {
-    cancel_requested_.store(false);
-
-    const auto goal = goal_handle->get_goal();
-    const auto & step = goal->task;
-    const uint32_t step_id = step.step_id;
-
-    bool success = false;
-    std::string message;
-
-    RCLCPP_INFO(
-      get_logger(),
-      "Executing action '%s' (step_id=%u)",
-      step.action.c_str(), step_id);
-
-    if (step.action == "goto")
+    try
     {
-      const std::string & location = step.args[0];
-      publish_feedback(goal_handle, step_id,
-        "Moving to " + location);
+      cancel_requested_.store(false);
 
-      success = nav_->GoTo(location);
-      message = success
-        ? "Arrived to " + location
-        : "Failed goto " + location;
-    }
-    else if (step.action == "say")
-    {
-      const std::string & text = step.args[0];
-      publish_feedback(goal_handle, step_id,
-        "Saying: " + text);
+      const auto goal = goal_handle->get_goal();
+      const auto & step = goal->task;
+      const uint32_t step_id = step.step_id;
 
-      success = hri_->Say(text);
-      message = success ? "Finished saying" : "Failed to say";
-    }
-    else if (step.action == "listen")
-    {
-      const std::string grammar =
-        step.args.empty() ? "" : step.args[0];
+      bool success = false;
+      std::string message;
 
-      publish_feedback(goal_handle, step_id, "Listening...");
+      RCLCPP_INFO(
+        get_logger(),
+        "Executing action '%s' (step_id=%u)",
+        step.action.c_str(), step_id);
 
-      const std::string heard = hri_->Listen(grammar);
-
-      if (!heard.empty())
+      if (step.action == "goto")
       {
-        success = true;
-        message = "Heard: " + heard;
-        RCLCPP_INFO(
-          get_logger(),
-          "HRI heard: %s", heard.c_str());
+        const std::string & location = step.args[0];
+        publish_feedback(goal_handle, step_id,
+          "Moving to " + location);
+
+        success = nav_->GoTo(location);
+        message = success
+          ? "Arrived to " + location
+          : "Failed goto " + location;
+      }
+      else if (step.action == "say")
+      {
+        const std::string & text = step.args[0];
+        publish_feedback(goal_handle, step_id,
+          "Saying: " + text);
+
+        success = hri_->Say(text);
+        message = success ? "Finished saying" : "Failed to say";
+      }
+      else if (step.action == "listen")
+      {
+        const std::string grammar =
+          step.args.empty() ? "" : step.args[0];
+
+        publish_feedback(goal_handle, step_id, "Listening...");
+
+        const std::string heard = hri_->Listen(grammar);
+
+        if (!heard.empty())
+        {
+          success = true;
+          message = "Heard: " + heard;
+          RCLCPP_INFO(
+            get_logger(),
+            "HRI heard: %s", heard.c_str());
+        }
+        else
+        {
+          success = false;
+          message = "Listen failed or timed out";
+        }
+      }
+
+      auto result = std::make_shared<ExecuteTask::Result>();
+      result->result.step_id = step_id;
+      result->result.message = message;
+
+      if (goal_handle->is_canceling() || cancel_requested_.load())
+      {
+        result->result.status =
+          executor_interfaces::msg::TaskResult::ABORTED;
+        goal_handle->canceled(result);
+        return;
+      }
+
+      if (success)
+      {
+        result->result.status =
+          executor_interfaces::msg::TaskResult::SUCCESS;
+        goal_handle->succeed(result);
       }
       else
       {
-        success = false;
-        message = "Listen failed or timed out";
+        result->result.status =
+          executor_interfaces::msg::TaskResult::FAILURE;
+        goal_handle->abort(result);
       }
     }
-
-    auto result = std::make_shared<ExecuteTask::Result>();
-    result->result.step_id = step_id;
-    result->result.message = message;
-
-    if (goal_handle->is_canceling() || cancel_requested_.load())
+    catch (const std::exception & e)
     {
-      result->result.status =
-        executor_interfaces::msg::TaskResult::ABORTED;
-      goal_handle->canceled(result);
-      return;
-    }
+      RCLCPP_ERROR(
+        get_logger(),
+        "Exception in task execution: %s", e.what());
 
-    if (success)
-    {
-      result->result.status =
-        executor_interfaces::msg::TaskResult::SUCCESS;
-      goal_handle->succeed(result);
-    }
-    else
-    {
+      auto result = std::make_shared<ExecuteTask::Result>();
+      result->result.step_id =
+        goal_handle->get_goal()->task.step_id;
       result->result.status =
         executor_interfaces::msg::TaskResult::FAILURE;
+      result->result.message = e.what();
+
       goal_handle->abort(result);
     }
   }
