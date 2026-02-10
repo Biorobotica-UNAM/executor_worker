@@ -54,7 +54,7 @@ private:
     const auto & step = goal->task;
 
     static const std::set<std::string> valid_actions =
-      {"goto", "say", "listen", "waitfor", "listenfor"};
+      {"goto", "say", "listen", "wait_for", "listen_for"};
 
     if (valid_actions.find(step.action) == valid_actions.end())
     {
@@ -127,7 +127,7 @@ private:
         success = hri_->Say(text);
         message = success ? "Finished saying" : "Failed to say";
       }
-      else if (step.action == "listen" || "listenfor")
+      else if (step.action == "listen" || "listen_for")
       {
         const std::string grammar = step.args.empty() ? "" : step.args[0];
         publish_feedback(goal_handle, step_id, "Listening...");
@@ -146,7 +146,7 @@ private:
           message = "Listen failed or timed out";
         }
       }
-      else if (step.action == "waitfor")
+      else if (step.action == "wait_for")
       {
         publish_feedback(goal_handle, step_id, "Checking door status...");
         success = hardware_->CheckDoor();
