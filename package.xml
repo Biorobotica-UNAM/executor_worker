@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>tasks</name>
+  <name>executor_worker</name>
   <version>0.1.0</version>
-  <description>State machines for RoboCup@HOME 2026</description>
+  <description>Actions for RoboCup@HOME 2026</description>
 
-  <maintainer email="marco.Soriano5102@comunidad.unam.mx">
+  <maintainer email="marco.soriano5102@comunidad.unam.mx">
     Marco Soriano
   </maintainer>
 

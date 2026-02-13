@@ -1,0 +1,15 @@
+<launch>
+
+  <group>
+    <push_ros_namespace namespace="executor_worker"/>
+
+    <node
+      pkg="executor_worker"
+      exec="executor_worker_node"
+      name="executor_worker_node"
+      output="screen"
+    />
+  </group>
+
+</launch>
+
