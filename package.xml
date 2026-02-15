@@ -32,6 +32,7 @@
   <depend>navigation_tools</depend>
   <depend>manipulation_tools</depend>
   <depend>planning_tools</depend>
+  <depend>executor_tools</depend>
 
   <depend>manipulation_planner</depend>
 

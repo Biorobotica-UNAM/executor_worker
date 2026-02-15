@@ -24,6 +24,7 @@ find_package(hardware_tools REQUIRED)
 find_package(manipulation_tools REQUIRED)
 find_package(navigation_tools REQUIRED)
 find_package(planning_tools REQUIRED)
+find_package(executor_tools REQUIRED)
 find_package(manipulation_planner REQUIRED)
 
 include_directories(
@@ -47,6 +48,7 @@ ament_target_dependencies(executor_worker_node
   manipulation_tools
   navigation_tools
   planning_tools
+  executor_tools
   manipulation_planner
 )
 
