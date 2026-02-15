@@ -25,13 +25,13 @@ public:
   ExecutorWorkerNode()
   : Node("executor_worker_node")
   {
-    action_server_ =
+    actionServer =
       rclcpp_action::create_server<ExecuteTask>(
         this,
         "/executor/execute_task",
-        std::bind(&ExecutorWorkerNode::handle_goal, this, _1, _2),
-        std::bind(&ExecutorWorkerNode::handle_cancel, this, _1),
-        std::bind(&ExecutorWorkerNode::handle_accepted, this, _1)
+        std::bind(&ExecutorWorkerNode::handleGoal, this, _1, _2),
+        std::bind(&ExecutorWorkerNode::handleCancel, this, _1),
+        std::bind(&ExecutorWorkerNode::handleAccepted, this, _1)
       );
 
     RCLCPP_INFO(
@@ -40,24 +40,24 @@ public:
   }
 
   /* ===================== INIT TOOLS ===================== */
-  void init_tools()
-  {
-    // Ahora shared_from_this() es válido
-    listen_ = std::make_shared<Listen>(shared_from_this());
-    say_    = std::make_shared<Say>(shared_from_this());
 
-    action_map_["listen"] =
+  void initTools()
+  {
+    listen = std::make_shared<Listen>(shared_from_this());
+    say    = std::make_shared<Say>(shared_from_this());
+
+    actionMap["listen"] =
       [this](const std::string& arg,
              const std::shared_ptr<GoalHandleExecuteTask>& gh)
       {
-        return listen_->run(arg, gh);
+        return listen->run(arg, gh);
       };
 
-    action_map_["say"] =
+    actionMap["say"] =
       [this](const std::string& arg,
              const std::shared_ptr<GoalHandleExecuteTask>& gh)
       {
-        return say_->run(arg, gh);
+        return say->run(arg, gh);
       };
   }
 
@@ -65,13 +65,13 @@ private:
 
   /* ===================== ACTION CALLBACKS ===================== */
 
-  rclcpp_action::GoalResponse handle_goal(
+  rclcpp_action::GoalResponse handleGoal(
     const rclcpp_action::GoalUUID &,
     std::shared_ptr<const ExecuteTask::Goal> goal)
   {
     const auto & step = goal->task;
 
-    if (action_map_.find(step.action) == action_map_.end())
+    if (actionMap.find(step.action) == actionMap.end())
     {
       RCLCPP_WARN(
         get_logger(),
@@ -83,27 +83,27 @@ private:
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
 
-  rclcpp_action::CancelResponse handle_cancel(
+  rclcpp_action::CancelResponse handleCancel(
     const std::shared_ptr<GoalHandleExecuteTask>)
   {
     return rclcpp_action::CancelResponse::ACCEPT;
   }
 
-  void handle_accepted(
-    const std::shared_ptr<GoalHandleExecuteTask> goal_handle)
+  void handleAccepted(
+    const std::shared_ptr<GoalHandleExecuteTask> goalHandle)
   {
     std::thread(
       &ExecutorWorkerNode::execute,
       this,
-      goal_handle).detach();
+      goalHandle).detach();
   }
 
   /* ===================== EXECUTION ===================== */
 
   void execute(
-    const std::shared_ptr<GoalHandleExecuteTask> goal_handle)
+    const std::shared_ptr<GoalHandleExecuteTask> goalHandle)
   {
-    const auto goal = goal_handle->get_goal();
+    const auto goal = goalHandle->get_goal();
     const auto & step = goal->task;
 
     const std::string argument =
@@ -112,11 +112,12 @@ private:
     bool success = false;
     std::string message;
 
-    auto it = action_map_.find(step.action);
+    auto it = actionMap.find(step.action);
 
-    if (it != action_map_.end())
+    if (it != actionMap.end())
     {
-      success = it->second(argument, goal_handle);
+      success = it->second(argument, goalHandle);
+
       message = success ?
         "Execution authorized" :
         "Execution rejected";
@@ -137,29 +138,29 @@ private:
     {
       result->result.status =
         executor_interfaces::msg::TaskResult::SUCCESS;
-      goal_handle->succeed(result);
+      goalHandle->succeed(result);
     }
     else
     {
       result->result.status =
         executor_interfaces::msg::TaskResult::FAILURE;
-      goal_handle->abort(result);
+      goalHandle->abort(result);
     }
   }
 
   /* ===================== MEMBERS ===================== */
 
-  rclcpp_action::Server<ExecuteTask>::SharedPtr action_server_;
+  rclcpp_action::Server<ExecuteTask>::SharedPtr actionServer;
 
-  std::shared_ptr<Listen> listen_;
-  std::shared_ptr<Say> say_;
+  std::shared_ptr<Listen> listen;
+  std::shared_ptr<Say> say;
 
   using ActionFunction =
     std::function<bool(
       const std::string&,
       const std::shared_ptr<GoalHandleExecuteTask>&)>;
 
-  std::unordered_map<std::string, ActionFunction> action_map_;
+  std::unordered_map<std::string, ActionFunction> actionMap;
 };
 
 
@@ -172,8 +173,7 @@ int main(int argc, char ** argv)
   auto node =
     std::make_shared<ExecutorWorkerNode>();
 
-  // IMPORTANTE: después de make_shared
-  node->init_tools();
+  node->initTools();
 
   rclcpp::spin(node);
 
