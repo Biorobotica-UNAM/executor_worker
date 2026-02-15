@@ -11,6 +11,7 @@
 
 #include "executor_tools/Listen.hpp"
 #include "executor_tools/Say.hpp"
+#include "executor_tools/HRI.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -43,8 +44,13 @@ public:
 
   void initTools()
   {
-    listen = std::make_shared<Listen>(shared_from_this());
-    say    = std::make_shared<Say>(shared_from_this());
+    auto nodePtr = shared_from_this();
+
+    // Crear UNA sola instancia de HRI
+    hri = std::make_shared<HRI>(nodePtr);
+
+    listen = std::make_shared<Listen>(nodePtr, hri);
+    say    = std::make_shared<Say>(nodePtr, hri);
 
     actionMap["listen"] =
       [this](const std::string& arg,
@@ -152,6 +158,7 @@ private:
 
   rclcpp_action::Server<ExecuteTask>::SharedPtr actionServer;
 
+  std::shared_ptr<HRI> hri;
   std::shared_ptr<Listen> listen;
   std::shared_ptr<Say> say;
 
