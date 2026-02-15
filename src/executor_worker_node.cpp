@@ -34,19 +34,15 @@ public:
         std::bind(&ExecutorWorkerNode::handle_accepted, this, _1)
       );
 
-    init_tools();
-
     RCLCPP_INFO(
       get_logger(),
       "executor_worker_node ready (Listen & Say only)");
   }
 
-private:
-
   /* ===================== INIT TOOLS ===================== */
-
   void init_tools()
   {
+    // Ahora shared_from_this() es válido
     listen_ = std::make_shared<Listen>(shared_from_this());
     say_    = std::make_shared<Say>(shared_from_this());
 
@@ -64,6 +60,8 @@ private:
         return say_->run(arg, gh);
       };
   }
+
+private:
 
   /* ===================== ACTION CALLBACKS ===================== */
 
@@ -173,6 +171,9 @@ int main(int argc, char ** argv)
 
   auto node =
     std::make_shared<ExecutorWorkerNode>();
+
+  // IMPORTANTE: después de make_shared
+  node->init_tools();
 
   rclcpp::spin(node);
 
