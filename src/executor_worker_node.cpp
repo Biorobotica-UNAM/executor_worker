@@ -11,7 +11,8 @@
 
 #include "executor_tools/Listen.hpp"
 #include "executor_tools/Say.hpp"
-#include "executor_tools/HRI.hpp"
+
+#include "hri_tools/HRI.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -46,7 +47,7 @@ public:
   {
     auto nodePtr = shared_from_this();
 
-    // Crear UNA sola instancia de HRI
+    // UNA sola instancia de HRI
     hri = std::make_shared<HRI>(nodePtr);
 
     listen = std::make_shared<Listen>(nodePtr, hri);
