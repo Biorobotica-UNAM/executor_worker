@@ -49,7 +49,7 @@ public:
     // Instancias de executor_tools
     listen = std::make_shared<Listen>(nodePtr, hri);
     say = std::make_shared<Say>(nodePtr, hri);
-    goto = std::make_shared<GoTo>(nodePtr, navigation);
+    go_to = std::make_shared<GoTo>(nodePtr, navigation);
 
     actionMap["listen"] =
         [this](const std::string &arg,
@@ -66,7 +66,7 @@ public:
     actionMap["goto"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return GoTo->run(arg, gh);
+          return go_to->run(arg, gh);
         };
   }
 
@@ -137,9 +137,10 @@ private:
   rclcpp_action::Server<ExecuteTask>::SharedPtr actionServer;
 
   std::shared_ptr<HRI> hri;
+  std::shared_ptr<Navigation> navigation;
   std::shared_ptr<Listen> listen;
   std::shared_ptr<Say> say;
-  std::shared_ptr<Navigation> navigation;
+  std::shared_ptr<GoTo> go_to;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
