@@ -9,10 +9,12 @@
 
 #include "executor_interfaces/action/execute_task.hpp"
 
+#include "executor_tools/Check.hpp"
 #include "executor_tools/GoTo.hpp"
 #include "executor_tools/Listen.hpp"
 #include "executor_tools/Say.hpp"
 
+#include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
 #include "navigation_tools/Navigation.hpp"
 
@@ -46,10 +48,14 @@ public:
     // Instancia de navigation
     navigation = std::make_shared<Navigation>(nodePtr);
 
+    // Instancia de Hardware
+    hardware = std::make_shared<Hardware>(nodePtr);
+
     // Instancias de executor_tools
     listen = std::make_shared<Listen>(nodePtr, hri);
     say = std::make_shared<Say>(nodePtr, hri);
     go_to = std::make_shared<GoTo>(nodePtr, navigation);
+    check = std::make_shared<Check>(nodePtr, hardware);
 
     actionMap["listen"] =
         [this](const std::string &arg,
@@ -67,6 +73,11 @@ public:
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
           return go_to->run(arg, gh);
+        };
+    actionMap["wait"] =
+        [this](const std::string &arg,
+               const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+          return check->run(arg, gh);
         };
   }
 
@@ -138,9 +149,11 @@ private:
 
   std::shared_ptr<HRI> hri;
   std::shared_ptr<Navigation> navigation;
+  std::shared_ptr<Hardware> hardware;
   std::shared_ptr<Listen> listen;
   std::shared_ptr<Say> say;
   std::shared_ptr<GoTo> go_to;
+  std::shared_ptr<Check> check;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
