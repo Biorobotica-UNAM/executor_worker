@@ -13,10 +13,12 @@
 #include "executor_tools/GoTo.hpp"
 #include "executor_tools/Listen.hpp"
 #include "executor_tools/Say.hpp"
+#include "executor_tools/Save.hpp"
 
 #include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
 #include "navigation_tools/Navigation.hpp"
+#include "knowledge_tools/KnowledgeTools.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -34,7 +36,7 @@ public:
         std::bind(&ExecutorWorkerNode::handleAccepted, this, _1));
 
     RCLCPP_INFO(get_logger(),
-                "executor_worker_node ready (Listen & Say & navigation only)");
+                "executor_worker_node ready (Listen, Say, Nav, DoorCheck & Save are Ready)");
   }
 
   /* ===================== INIT TOOLS ===================== */
@@ -48,6 +50,9 @@ public:
     // Instancia de navigation
     navigation = std::make_shared<Navigation>(nodePtr);
 
+    // Instancia de Knowledge
+    knowledge = std::make_shared<KnowledgeTools>(nodePtr);
+
     // Instancia de Hardware
     hardware = std::make_shared<Hardware>(nodePtr);
 
@@ -56,6 +61,7 @@ public:
     say = std::make_shared<Say>(nodePtr, hri);
     go_to = std::make_shared<GoTo>(nodePtr, navigation);
     check = std::make_shared<Check>(nodePtr, hardware);
+    save = std::make_shared<Save>(nodePtr, knowledge);
 
     actionMap["listen_for"] =
         [this](const std::string &arg,
@@ -78,6 +84,11 @@ public:
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
           return check->run(arg, gh);
+        };
+    actionMap["save"] =
+        [this](const std::string &arg,
+               const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+          return save->run(arg, gh);
         };
   }
 
@@ -150,10 +161,12 @@ private:
   std::shared_ptr<HRI> hri;
   std::shared_ptr<Navigation> navigation;
   std::shared_ptr<Hardware> hardware;
+  std::shared_ptr<KnowledgeTools> knowledge;
   std::shared_ptr<Listen> listen;
   std::shared_ptr<Say> say;
   std::shared_ptr<GoTo> go_to;
   std::shared_ptr<Check> check;
+  std::shared_ptr<Save> save;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
