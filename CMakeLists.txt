@@ -27,7 +27,6 @@ find_package(planning_tools REQUIRED)
 find_package(executor_tools REQUIRED)
 find_package(manipulation_planner REQUIRED)
 
-find_package(knowledge_tools REQUIRED)
 
 include_directories(
   include
@@ -52,7 +51,6 @@ ament_target_dependencies(executor_worker_node
   planning_tools
   executor_tools
   manipulation_planner
-  knowledge_tools
 )
 
 install(TARGETS

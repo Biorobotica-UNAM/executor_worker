@@ -18,7 +18,7 @@
 #include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
 #include "navigation_tools/Navigation.hpp"
-#include "knowledge_tools/KnowledgeTools.hpp"
+#include "executor_tools/Knowledge.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -51,7 +51,7 @@ public:
     navigation = std::make_shared<Navigation>(nodePtr);
 
     // Instancia de Knowledge
-    knowledge = std::make_shared<KnowledgeTools>(nodePtr);
+    knowledge = std::make_shared<Knowledge>(nodePtr);
 
     // Instancia de Hardware
     hardware = std::make_shared<Hardware>(nodePtr);
@@ -161,7 +161,7 @@ private:
   std::shared_ptr<HRI> hri;
   std::shared_ptr<Navigation> navigation;
   std::shared_ptr<Hardware> hardware;
-  std::shared_ptr<KnowledgeTools> knowledge;
+  std::shared_ptr<Knowledge> knowledge;
   std::shared_ptr<Listen> listen;
   std::shared_ptr<Say> say;
   std::shared_ptr<GoTo> go_to;
