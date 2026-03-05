@@ -14,6 +14,7 @@
 #include "executor_tools/Listen.hpp"
 #include "executor_tools/Say.hpp"
 #include "executor_tools/Save.hpp"
+#include "executor_tools/Executor.hpp" 
 
 #include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
@@ -98,14 +99,7 @@ private:
   rclcpp_action::GoalResponse
   handleGoal(const rclcpp_action::GoalUUID &,
              std::shared_ptr<const ExecuteTask::Goal> goal) {
-    const auto &step = goal->task;
-
-    if (actionMap.find(step.action) == actionMap.end()) {
-      RCLCPP_WARN(get_logger(), "Rejected unknown action: %s",
-                  step.action.c_str());
-      return rclcpp_action::GoalResponse::REJECT;
-    }
-
+    // Aceptamos la meta para poder procesar el error y mandar authorize en execute()
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
 
@@ -133,11 +127,20 @@ private:
 
     if (it != actionMap.end()) {
       success = it->second(argument, goalHandle);
-
       message = success ? "Execution authorized" : "Execution rejected";
     } else {
+      // Si la acción no es válida, mandamos el authorize con los parámetros que pediste
+      Executor report_executor(shared_from_this());
+      
+      report_executor.authorize(
+          step.action,
+          argument,
+          "reject",
+          "Action not valid: " + step.action
+      );
+
       success = false;
-      message = "Unknown action";
+      message = "Unknown action: " + step.action;
     }
 
     auto result = std::make_shared<ExecuteTask::Result>();
