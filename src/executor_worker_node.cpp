@@ -64,7 +64,7 @@ public:
     check = std::make_shared<Check>(nodePtr, hardware);
     save = std::make_shared<Save>(nodePtr, knowledge);
 
-    actionMap["listen_for"] =
+    actionMap["listen"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
           return listen->run(arg, gh);
@@ -81,7 +81,7 @@ public:
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
           return go_to->run(arg, gh);
         };
-    actionMap["wait_for"] =
+    actionMap["check"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
           return check->run(arg, gh);
