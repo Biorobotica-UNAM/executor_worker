@@ -14,6 +14,7 @@
 #include "executor_tools/Listen.hpp"
 #include "executor_tools/Say.hpp"
 #include "executor_tools/Save.hpp"
+#include "executor_tools/Follow.hpp"
 #include "executor_tools/Executor.hpp" 
 
 #include "hardware_tools/Hardware.hpp"
@@ -37,7 +38,7 @@ public:
         std::bind(&ExecutorWorkerNode::handleAccepted, this, _1));
 
     RCLCPP_INFO(get_logger(),
-                "executor_worker_node ready (Listen, Say, Nav, DoorCheck & Save are Ready)");
+                "executor_worker_node ready (Listen, Say, Nav, Follow, Check & Save Ready)");
   }
 
   /* ===================== INIT TOOLS ===================== */
@@ -63,6 +64,7 @@ public:
     go_to = std::make_shared<GoTo>(nodePtr, navigation);
     check = std::make_shared<Check>(nodePtr, hardware);
     save = std::make_shared<Save>(nodePtr, knowledge);
+    follow = std::make_shared<Follow>(nodePtr);
 
     actionMap["listen"] =
         [this](const std::string &arg,
@@ -90,6 +92,11 @@ public:
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
           return save->run(arg, gh);
+        };
+    actionMap["follow"] =
+        [this](const std::string &arg,
+               const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+          return follow->run(arg, gh);
         };
   }
 
@@ -170,6 +177,7 @@ private:
   std::shared_ptr<GoTo> go_to;
   std::shared_ptr<Check> check;
   std::shared_ptr<Save> save;
+  std::shared_ptr<Follow> follow;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
