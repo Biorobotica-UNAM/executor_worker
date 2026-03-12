@@ -1,5 +1,7 @@
 # Executor Worker Package
 
+## Proyecto Biorrobótica UNAM
+
 ## Description
 The **`executor_worker`** package serves as the physical execution layer for the **Justina** robot. Its primary responsibility is to receive high-level goals (actions) from the `Executor Manager`, process them using specialized toolsets from `executor_tools`, and report the final execution status back to the supervision system.
 
