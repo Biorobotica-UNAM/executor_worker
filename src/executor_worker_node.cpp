@@ -16,6 +16,7 @@
 #include "executor_tools/Save.hpp"
 #include "executor_tools/Follow.hpp"
 #include "executor_tools/Executor.hpp" 
+#include "executor_tools/MemorizeFace.hpp" 
 
 #include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
@@ -46,6 +47,9 @@ public:
   void initTools() {
     auto nodePtr = shared_from_this();
 
+    // Definimos las funciones en desarrollo
+    std::vector<std::string> dev = {"wait", "focus"};
+
     // UNA sola instancia de HRI
     hri = std::make_shared<HRI>(nodePtr);
 
@@ -65,6 +69,7 @@ public:
     check = std::make_shared<Check>(nodePtr, hardware);
     save = std::make_shared<Save>(nodePtr, knowledge);
     follow = std::make_shared<Follow>(nodePtr);
+    memorize_face = std::make_shared<MemorizeFace>(nodePtr);
 
     actionMap["listen"] =
         [this](const std::string &arg,
@@ -97,6 +102,13 @@ public:
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
           return follow->run(arg, gh);
+        };
+    actionMap["memorize_face"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+          // Resolvemos el label (ej: "name_1" -> "john")
+          std::string real_name = knowledge->getNameFromLabel(arg);
+          return memorize_face->run(real_name, gh);
         };
   }
 
@@ -178,6 +190,7 @@ private:
   std::shared_ptr<Check> check;
   std::shared_ptr<Save> save;
   std::shared_ptr<Follow> follow;
+  std::shared_ptr<MemorizeFace> memorize_face;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
