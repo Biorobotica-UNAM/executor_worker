@@ -48,7 +48,7 @@ public:
     auto nodePtr = shared_from_this();
 
     // Definimos las funciones en desarrollo
-    std::vector<std::string> dev = {"wait", "focus"};
+    std::vector<std::string> dev = {"wait", "focus", "find", "point", "take", "align", "drop"};
 
     // UNA sola instancia de HRI
     hri = std::make_shared<HRI>(nodePtr);
@@ -110,6 +110,30 @@ public:
           std::string real_name = knowledge->getNameFromLabel(arg);
           return memorize_face->run(real_name, gh);
         };
+
+    /* ===================== Registro automático para funciones en desarrollo ===================== */
+    for (const auto& tool_name : dev) {
+        actionMap[tool_name] = 
+            [this, tool_name](const std::string &arg, 
+                   const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+            RCLCPP_INFO(this->get_logger(), "Executing placeholder for: %s", tool_name.c_str());
+
+            // 1. Feedback rápido
+            auto feedback = std::make_shared<ExecuteTask::Feedback>();
+            feedback->feedback.message = "Tool '" + tool_name + "' is under development...";
+            gh->publish_feedback(feedback);
+
+            // 2. Reporte al Supervisor usando la estructura de Executor
+            Executor report_executor(shared_from_this());
+            // Avisamos en el mensaje que es un placeholder.
+            return report_executor.authorize(
+                tool_name, 
+                arg, 
+                "success", 
+                "PLACEHOLDER: " + tool_name + " not implemented yet."
+            );
+        };
+    }
   }
 
 private:
