@@ -21,6 +21,7 @@
 #include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
 #include "navigation_tools/Navigation.hpp"
+#include "vision_tools/Vision.hpp"
 #include "executor_tools/Knowledge.hpp"
 
 using std::placeholders::_1;
@@ -39,7 +40,7 @@ public:
         std::bind(&ExecutorWorkerNode::handleAccepted, this, _1));
 
     RCLCPP_INFO(get_logger(),
-                "executor_worker_node ready (Listen, Say, Nav, Follow, Check & Save Ready)");
+                "executor_worker_node ready (Listen, Say, Nav, Follow, Check, Save, Wait Ready)");
   }
 
   /* ===================== INIT TOOLS ===================== */
@@ -48,7 +49,7 @@ public:
     auto nodePtr = shared_from_this();
 
     // Definimos las funciones en desarrollo
-    std::vector<std::string> dev = {"wait", "focus", "find", "point", "take", "align", "drop"};
+    std::vector<std::string> dev = {"focus", "find", "point", "take", "align", "drop"};
 
     // UNA sola instancia de HRI
     hri = std::make_shared<HRI>(nodePtr);
@@ -62,6 +63,8 @@ public:
     // Instancia de Hardware
     hardware = std::make_shared<Hardware>(nodePtr);
 
+    vision = std::make_shared<Vision>(nodePtr);
+
     // Instancias de executor_tools
     listen = std::make_shared<Listen>(nodePtr, hri, knowledge);
     say = std::make_shared<Say>(nodePtr, hri);
@@ -70,6 +73,7 @@ public:
     save = std::make_shared<Save>(nodePtr, knowledge);
     follow = std::make_shared<Follow>(nodePtr);
     memorize_face = std::make_shared<MemorizeFace>(nodePtr);
+    wait = std::make_shared<Wait>(nodePtr);
 
     actionMap["listen"] =
         [this](const std::string &arg,
@@ -109,6 +113,11 @@ public:
           // Resolvemos el label (ej: "name_1" -> "john")
           std::string real_name = knowledge->getNameFromLabel(arg);
           return memorize_face->run(real_name, gh);
+        };
+    actionMap["wait"] =
+        [this](const std::string &arg,
+               const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+          return wait->run(arg, gh);
         };
 
     /* ===================== Registro automático para funciones en desarrollo ===================== */
@@ -208,6 +217,7 @@ private:
   std::shared_ptr<Navigation> navigation;
   std::shared_ptr<Hardware> hardware;
   std::shared_ptr<Knowledge> knowledge;
+  std::shared_ptr<Vision> vision;
   std::shared_ptr<Listen> listen;
   std::shared_ptr<Say> say;
   std::shared_ptr<GoTo> go_to;
@@ -215,6 +225,7 @@ private:
   std::shared_ptr<Save> save;
   std::shared_ptr<Follow> follow;
   std::shared_ptr<MemorizeFace> memorize_face;
+  std::shared_ptr<Wait> wait;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
