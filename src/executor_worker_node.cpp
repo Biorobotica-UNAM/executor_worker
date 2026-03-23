@@ -17,6 +17,7 @@
 #include "executor_tools/Follow.hpp"
 #include "executor_tools/Executor.hpp" 
 #include "executor_tools/MemorizeFace.hpp" 
+#include "executor_tools/Wait.hpp"
 
 #include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
