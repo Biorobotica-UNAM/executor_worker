@@ -18,8 +18,8 @@ find_package(talker_interfaces REQUIRED)
 find_package(known_locations_interfaces REQUIRED)
 find_package(manipulation_planner_interfaces REQUIRED)
 find_package(clips_interfaces REQUIRED)
-find_package(faces_interfaces REQUIRED)
-find_package(vision_interfaces REQUIRED)
+#find_package(faces_interfaces REQUIRED)
+#find_package(vision_interfaces REQUIRED)
 
 find_package(hri_tools REQUIRED)
 find_package(hardware_tools REQUIRED)
@@ -28,7 +28,7 @@ find_package(navigation_tools REQUIRED)
 find_package(planning_tools REQUIRED)
 find_package(executor_tools REQUIRED)
 find_package(manipulation_planner REQUIRED)
-find_package(vision_tools REQUIRED)
+#find_package(vision_tools REQUIRED)
 
 
 include_directories(
@@ -47,15 +47,15 @@ ament_target_dependencies(executor_worker_node
   executor_interfaces
   clips_interfaces
   manipulation_planner_interfaces
-  vision_interfaces
-  faces_interfaces
+  #vision_interfaces
+  #faces_interfaces
   hri_tools
   hardware_tools
   manipulation_tools
   navigation_tools
   planning_tools
   executor_tools
-  vision_tools
+  #vision_tools
   manipulation_planner
 )
 
