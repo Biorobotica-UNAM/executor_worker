@@ -219,7 +219,7 @@ private:
   std::shared_ptr<Navigation> navigation;
   std::shared_ptr<Hardware> hardware;
   std::shared_ptr<Knowledge> knowledge;
-  //std::shared_ptr<Vision> vision;
+  std::shared_ptr<Vision> vision;
   std::shared_ptr<Listen> listen;
   std::shared_ptr<Say> say;
   std::shared_ptr<GoTo> go_to;
