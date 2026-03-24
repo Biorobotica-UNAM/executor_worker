@@ -22,7 +22,7 @@
 #include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
 #include "navigation_tools/Navigation.hpp"
-//#include "vision_tools/Vision.hpp"
+#include "vision_tools/Vision.hpp"
 #include "executor_tools/Knowledge.hpp"
 
 using std::placeholders::_1;
@@ -64,6 +64,9 @@ public:
     // Instancia de Hardware
     hardware = std::make_shared<Hardware>(nodePtr);
 
+    // Instancia de Vision
+    vision = std::make_shared<Vision>(nodePtr);
+
     // Instancias de executor_tools
     listen = std::make_shared<Listen>(nodePtr, hri, knowledge);
     say = std::make_shared<Say>(nodePtr, hri);
@@ -72,7 +75,7 @@ public:
     save = std::make_shared<Save>(nodePtr, knowledge);
     follow = std::make_shared<Follow>(nodePtr);
     memorize_face = std::make_shared<MemorizeFace>(nodePtr);
-    wait = std::make_shared<Wait>(nodePtr);
+    wait = std::make_shared<Wait>(nodePtr, vision);
 
     actionMap["listen"] =
         [this](const std::string &arg,
