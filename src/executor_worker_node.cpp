@@ -17,7 +17,7 @@
 #include "executor_tools/Follow.hpp"
 #include "executor_tools/Executor.hpp" 
 #include "executor_tools/MemorizeFace.hpp" 
-#include "executor_tools/Wait.hpp"
+#include "executor_tools/Find.hpp"
 
 #include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
@@ -41,7 +41,7 @@ public:
         std::bind(&ExecutorWorkerNode::handleAccepted, this, _1));
 
     RCLCPP_INFO(get_logger(),
-                "executor_worker_node ready (Listen, Say, Nav, Follow, Check, Save, Wait Ready)");
+                "executor_worker_node ready (Listen, Say, Nav, Follow, Check, Save, Find Ready)");
   }
 
   /* ===================== INIT TOOLS ===================== */
@@ -50,7 +50,7 @@ public:
     auto nodePtr = shared_from_this();
 
     // Definimos las funciones en desarrollo
-    std::vector<std::string> dev = {"focus", "find", "point", "take", "align", "drop"};
+    std::vector<std::string> dev = {"focus",  "point", "take", "align", "drop"};
 
     // UNA sola instancia de HRI
     hri = std::make_shared<HRI>(nodePtr);
@@ -74,8 +74,8 @@ public:
     check = std::make_shared<Check>(nodePtr, hardware);
     save = std::make_shared<Save>(nodePtr, knowledge);
     follow = std::make_shared<Follow>(nodePtr);
-    memorize_face = std::make_shared<MemorizeFace>(nodePtr);
-    wait = std::make_shared<Wait>(nodePtr, vision);
+    memorize_face = std::make_shared<MemorizeFace>(nodePtr, vision);
+    find = std::make_shared<Find>(nodePtr);
 
     actionMap["listen"] =
         [this](const std::string &arg,
@@ -116,11 +116,11 @@ public:
           std::string real_name = knowledge->getNameFromLabel(arg);
           return memorize_face->run(real_name, gh);
         };
-    actionMap["wait"] = 
+    actionMap["find"] = 
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return wait->run(arg, gh);
-};
+    return find->run(arg, gh);
+        };
 
     /* ===================== Registro automático para funciones en desarrollo ===================== */
     for (const auto& tool_name : dev) {
@@ -227,7 +227,7 @@ private:
   std::shared_ptr<Save> save;
   std::shared_ptr<Follow> follow;
   std::shared_ptr<MemorizeFace> memorize_face;
-  std::shared_ptr<Wait> wait;
+  std::shared_ptr<Find> find;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
