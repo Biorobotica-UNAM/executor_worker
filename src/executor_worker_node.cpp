@@ -70,7 +70,7 @@ public:
 
     // Instancias de executor_tools
     listen = std::make_shared<Listen>(nodePtr, hri, knowledge);
-    say = std::make_shared<Say>(nodePtr, hri);
+    say = std::make_shared<Say>(nodePtr, hri, knowledge);
     go_to = std::make_shared<GoTo>(nodePtr, navigation);
     check = std::make_shared<Check>(nodePtr, hardware);
     save = std::make_shared<Save>(nodePtr, knowledge);
