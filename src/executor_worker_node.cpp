@@ -18,6 +18,7 @@
 #include "executor_tools/Executor.hpp" 
 #include "executor_tools/MemorizeFace.hpp" 
 #include "executor_tools/Find.hpp"
+#include "executor_tools/Point.hpp"
 
 #include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
@@ -50,7 +51,7 @@ public:
     auto nodePtr = shared_from_this();
 
     // Definimos las funciones en desarrollo
-    std::vector<std::string> dev = {"focus",  "point", "take", "align", "drop"};
+    std::vector<std::string> dev = {"focus", "take", "align", "drop"};
 
     // UNA sola instancia de HRI
     hri = std::make_shared<HRI>(nodePtr);
@@ -76,6 +77,7 @@ public:
     follow = std::make_shared<Follow>(nodePtr);
     memorize_face = std::make_shared<MemorizeFace>(nodePtr, vision);
     find = std::make_shared<Find>(nodePtr);
+    point_tool = std::make_shared<Point>(nodePtr, hardware);
 
     actionMap["listen"] =
         [this](const std::string &arg,
@@ -120,6 +122,11 @@ public:
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
     return find->run(arg, gh);
+        };
+    actionMap["point"] =   
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+    return point_tool->run(arg, gh);
         };
 
     /* ===================== Registro automático para funciones en desarrollo ===================== */
@@ -228,6 +235,7 @@ private:
   std::shared_ptr<Follow> follow;
   std::shared_ptr<MemorizeFace> memorize_face;
   std::shared_ptr<Find> find;
+  std::shared_ptr<Point> point_tool;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
