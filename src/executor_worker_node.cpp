@@ -19,6 +19,7 @@
 #include "executor_tools/MemorizeFace.hpp" 
 #include "executor_tools/Find.hpp"
 #include "executor_tools/Point.hpp"
+#include "tasks_tools/Tasks.hpp" 
 
 #include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
@@ -68,6 +69,9 @@ public:
     // Instancia de Vision
     vision = std::make_shared<Vision>(nodePtr);
 
+    // Instancia de Tasks
+    tasks = std::make_shared<Tasks>(nodePtr);
+
     // Instancias de executor_tools
     listen = std::make_shared<Listen>(nodePtr, hri, knowledge);
     say = std::make_shared<Say>(nodePtr, hri, knowledge);
@@ -76,7 +80,7 @@ public:
     save = std::make_shared<Save>(nodePtr, knowledge);
     follow = std::make_shared<Follow>(nodePtr);
     memorize_face = std::make_shared<MemorizeFace>(nodePtr, vision);
-    find = std::make_shared<Find>(nodePtr);
+    find = std::make_shared<Find>(nodePtr, tasks);
     point_tool = std::make_shared<Point>(nodePtr, hardware);
 
     actionMap["listen"] =
@@ -227,6 +231,7 @@ private:
   std::shared_ptr<Hardware> hardware;
   std::shared_ptr<Knowledge> knowledge;
   std::shared_ptr<Vision> vision;
+  std::shared_ptr<Tasks> tasks;
   std::shared_ptr<Listen> listen;
   std::shared_ptr<Say> say;
   std::shared_ptr<GoTo> go_to;
