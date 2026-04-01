@@ -80,7 +80,7 @@ public:
     save = std::make_shared<Save>(nodePtr, knowledge);
     follow = std::make_shared<Follow>(nodePtr);
     memorize_face = std::make_shared<MemorizeFace>(nodePtr, vision);
-    find = std::make_shared<Find>(nodePtr, tasks);
+    find = std::make_shared<Find>(nodePtr, tasks,knowledge);
     point_tool = std::make_shared<Point>(nodePtr, hardware);
 
     actionMap["listen"] =
