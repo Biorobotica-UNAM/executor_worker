@@ -20,6 +20,7 @@
 #include "executor_tools/Find.hpp"
 #include "executor_tools/Point.hpp"
 #include "tasks_tools/Tasks.hpp" 
+#include "executor_tools/Describe.hpp"
 
 #include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
@@ -82,6 +83,7 @@ public:
     memorize_face = std::make_shared<MemorizeFace>(nodePtr, vision);
     find = std::make_shared<Find>(nodePtr, tasks,knowledge);
     point_tool = std::make_shared<Point>(nodePtr, hardware);
+    describe_tool = std::make_shared<Describe>(nodePtr, knowledge);
 
     actionMap["listen"] =
         [this](const std::string &arg,
@@ -131,6 +133,11 @@ public:
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
     return point_tool->run(arg, gh);
+        };
+    actionMap["describe"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+    return describe_tool->run(arg, gh);
         };
 
     /* ===================== Registro automático para funciones en desarrollo ===================== */
@@ -241,6 +248,7 @@ private:
   std::shared_ptr<MemorizeFace> memorize_face;
   std::shared_ptr<Find> find;
   std::shared_ptr<Point> point_tool;
+  std::shared_ptr<Describe> describe_tool;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
