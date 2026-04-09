@@ -20,8 +20,11 @@
 #include "executor_tools/MemorizeFace.hpp" 
 #include "executor_tools/Find.hpp"
 #include "executor_tools/Point.hpp"
-#include "tasks_tools/Tasks.hpp" 
 #include "executor_tools/Describe.hpp"
+#include "executor_tools/Focus.hpp"
+#include "executor_tools/Unfocus.hpp"
+
+#include "tasks_tools/Tasks.hpp" 
 
 #include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
@@ -85,6 +88,8 @@ public:
     find = std::make_shared<Find>(nodePtr, tasks,knowledge);
     point_tool = std::make_shared<Point>(nodePtr, hardware);
     describe_tool = std::make_shared<Describe>(nodePtr, knowledge);
+    focus_tool = std::make_shared<Focus>(nodePtr, knowledge);
+	unfocus_tool = std::make_shared<Unfocus>(nodePtr, knowledge);
 
     actionMap["listen"] =
         [this](const std::string &arg,
@@ -139,6 +144,16 @@ public:
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
     return describe_tool->run(arg, gh);
+        };
+	actionMap["focus"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+    return focus_tool->run(arg, gh);
+        };
+	actionMap["unfocus"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+    return unfocus_tool->run(arg, gh);
         };
 
     /* ===================== Registro automático para funciones en desarrollo ===================== */
@@ -270,6 +285,8 @@ private:
   std::shared_ptr<Find> find;
   std::shared_ptr<Point> point_tool;
   std::shared_ptr<Describe> describe_tool;
+  std::shared_ptr<Focus> focus_tool;
+  std::shared_ptr<Unfocus> unfocus_tool;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
