@@ -8,6 +8,7 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 
 #include "executor_interfaces/action/execute_task.hpp"
+#include "executor_interfaces/srv/update_knowledge.hpp"
 
 #include "executor_tools/Check.hpp"
 #include "executor_tools/GoTo.hpp"
@@ -163,6 +164,25 @@ public:
             );
         };
     }
+
+    update_knowledge_service = this->create_service<executor_interfaces::srv::UpdateKnowledge>(
+        "/knowledge/update_label",
+        [this](const std::shared_ptr<executor_interfaces::srv::UpdateKnowledge::Request> request,
+              std::shared_ptr<executor_interfaces::srv::UpdateKnowledge::Response> response) {
+            
+            RCLCPP_INFO(this->get_logger(), "External update request: %s = %s", 
+                        request->label.c_str(), request->value.c_str());
+            
+            // Llamamos a la nueva función que pusimos en Knowledge.hpp
+            response->success = knowledge->updateFromService(request->label, request->value);
+            
+            if (response->success) {
+                response->message = "Label " + request->label + " updated in RAM and Disk";
+            } else {
+                response->message = "Failed to update label";
+            }
+        }
+    );
   }
 
 private:
@@ -232,6 +252,7 @@ private:
   /* ===================== MEMBERS ===================== */
 
   rclcpp_action::Server<ExecuteTask>::SharedPtr actionServer;
+  rclcpp::Service<executor_interfaces::srv::UpdateKnowledge>::SharedPtr update_knowledge_service;
 
   std::shared_ptr<HRI> hri;
   std::shared_ptr<Navigation> navigation;

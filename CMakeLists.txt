@@ -59,6 +59,10 @@ ament_target_dependencies(executor_worker_node
   manipulation_planner
 )
 
+ament_export_dependencies(
+  executor_interfaces
+)
+
 install(TARGETS
   executor_worker_node
   DESTINATION lib/${PROJECT_NAME}
