@@ -88,8 +88,8 @@ public:
     find = std::make_shared<Find>(nodePtr, tasks,knowledge);
     point_tool = std::make_shared<Point>(nodePtr, hardware);
     describe_tool = std::make_shared<Describe>(nodePtr, knowledge);
-    focus_tool = std::make_shared<Focus>(nodePtr, knowledge);
-	unfocus_tool = std::make_shared<Unfocus>(nodePtr, knowledge);
+    focus_tool = std::make_shared<Focus>(nodePtr);
+	unfocus_tool = std::make_shared<Unfocus>(nodePtr);
 
     actionMap["listen"] =
         [this](const std::string &arg,
