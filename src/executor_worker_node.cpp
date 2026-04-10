@@ -222,45 +222,68 @@ private:
   /* ===================== EXECUTION ===================== */
 
   void execute(const std::shared_ptr<GoalHandleExecuteTask> goalHandle) {
+    // 1. Verificación de seguridad inicial
+    if (!goalHandle) {
+        RCLCPP_ERROR(this->get_logger(), "Received a null goalHandle. Aborting execution.");
+        return;
+    }
+
     const auto goal = goalHandle->get_goal();
     const auto &step = goal->task;
-
     const std::string argument = step.args.empty() ? "" : step.args[0];
 
     bool success = false;
     std::string message;
 
-    auto it = actionMap.find(step.action);
+    // 2. Envolvemos TODO en un try-catch para atrapar el SegFault antes de que mate al proceso
+    try {
+        auto it = actionMap.find(step.action);
 
-    if (it != actionMap.end()) {
-      success = it->second(argument, goalHandle);
-      message = success ? "Execution authorized" : "Execution rejected";
-    } else {
-      // Si la acción no es válida, mandamos el authorize con los parámetros que pediste
-      Executor report_executor(shared_from_this());
-      
-      report_executor.authorize(
-          step.action,
-          argument,
-          "reject",
-          "Action not valid: " + step.action
-      );
-
-      success = false;
-      message = "Unknown action: " + step.action;
+        if (it != actionMap.end()) {
+            RCLCPP_INFO(this->get_logger(), "Executing action: %s", step.action.c_str());
+            
+            // Llamada a la Tool (Find, Listen, etc.)
+            success = it->second(argument, goalHandle);
+            
+            message = success ? "Execution authorized" : "Execution rejected/failed";
+        } else {
+            // Acción no válida
+            Executor report_executor(shared_from_this());
+            report_executor.authorize(step.action, argument, "reject", "Action not valid: " + step.action);
+            
+            success = false;
+            message = "Unknown action: " + step.action;
+        }
+    } 
+    catch (const std::exception &e) {
+        // SI ALGO TRUENA DENTRO DE LA TOOL, CAE AQUÍ Y EL WORKER SIGUE VIVO
+        RCLCPP_ERROR(this->get_logger(), "CRITICAL ERROR in Tool '%s': %s", step.action.c_str(), e.what());
+        success = false;
+        message = "Tool crashed internaly: " + std::string(e.what());
+    }
+    catch (...) {
+        // Atrapa errores raros que no son excepciones estándar
+        RCLCPP_ERROR(this->get_logger(), "UNKNOWN CRITICAL ERROR in Tool '%s'", step.action.c_str());
+        success = false;
+        message = "Tool caused an unknown memory error.";
     }
 
+    // 3. Responder al Action Client (Supervisor) de forma segura
     auto result = std::make_shared<ExecuteTask::Result>();
-
     result->result.step_id = step.step_id;
     result->result.message = message;
 
-    if (success) {
-      result->result.status = executor_interfaces::msg::TaskResult::SUCCESS;
-      goalHandle->succeed(result);
+    // Verificamos si el goalHandle sigue activo antes de responder
+    if (goalHandle->is_active()) {
+        if (success) {
+            result->result.status = executor_interfaces::msg::TaskResult::SUCCESS;
+            goalHandle->succeed(result);
+        } else {
+            result->result.status = executor_interfaces::msg::TaskResult::FAILURE;
+            goalHandle->abort(result);
+        }
     } else {
-      result->result.status = executor_interfaces::msg::TaskResult::FAILURE;
-      goalHandle->abort(result);
+        RCLCPP_WARN(this->get_logger(), "GoalHandle is no longer active, skipping result publish.");
     }
   }
 
