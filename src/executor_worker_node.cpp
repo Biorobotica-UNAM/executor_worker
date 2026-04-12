@@ -24,6 +24,7 @@
 #include "executor_tools/Focus.hpp"
 #include "executor_tools/Unfocus.hpp"
 #include "executor_tools/Saveloc.hpp"
+#include "executor_tools/Take.hpp"
 
 #include "tasks_tools/Tasks.hpp" 
 
@@ -90,8 +91,9 @@ public:
     point_tool = std::make_shared<Point>(nodePtr, hardware);
     describe_tool = std::make_shared<Describe>(nodePtr, knowledge);
     focus_tool = std::make_shared<Focus>(nodePtr);
-	  unfocus_tool = std::make_shared<Unfocus>(nodePtr);
+	unfocus_tool = std::make_shared<Unfocus>(nodePtr);
     saveloc = std::make_shared<Saveloc>(nodePtr);
+    take_tool = std::make_shared<Take>(nodePtr, knowledge);
 
     actionMap["listen"] =
         [this](const std::string &arg,
@@ -157,10 +159,15 @@ public:
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
     return unfocus_tool->run(arg, gh);
         };
-  actionMap["saveloc"] = 
+    actionMap["saveloc"] = 
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
     return saveloc->run(arg, gh);
+        };
+    actionMap["take"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+    return take_tool->run(arg, gh);
         };
 
     /* ===================== Registro automático para funciones en desarrollo ===================== */
@@ -318,6 +325,7 @@ private:
   std::shared_ptr<Focus> focus_tool;
   std::shared_ptr<Unfocus> unfocus_tool;
   std::shared_ptr<Saveloc> saveloc;
+  std::shared_ptr<Take> take_tool;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
