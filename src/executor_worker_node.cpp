@@ -59,7 +59,7 @@ public:
     auto nodePtr = shared_from_this();
 
     // Definimos las funciones en desarrollo
-    std::vector<std::string> dev = { "take", "align", "drop"};
+    std::vector<std::string> dev = {"align", "drop"};
 
     // UNA sola instancia de HRI
     hri = std::make_shared<HRI>(nodePtr);
