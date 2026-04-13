@@ -86,7 +86,7 @@ public:
     check = std::make_shared<Check>(nodePtr, hardware);
     save = std::make_shared<Save>(nodePtr, knowledge);
     follow = std::make_shared<Follow>(nodePtr);
-    memorize_face = std::make_shared<MemorizeFace>(nodePtr, vision);
+    memorize_face = std::make_shared<MemorizeFace>(nodePtr, vision, knowledge);
     find = std::make_shared<Find>(nodePtr, tasks,knowledge);
     point_tool = std::make_shared<Point>(nodePtr, hardware);
     describe_tool = std::make_shared<Describe>(nodePtr, knowledge);
