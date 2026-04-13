@@ -130,9 +130,7 @@ public:
     actionMap["memorize_face"] = 
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          // Resolvemos el label (ej: "name_1" -> "john")
-          std::string real_name = knowledge->getNameFromLabel(arg);
-          return memorize_face->run(real_name, gh);
+          return memorize_face->run(arg, gh);
         };
     actionMap["find"] = 
         [this](const std::string &arg, 
