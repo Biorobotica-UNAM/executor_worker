@@ -10,6 +10,7 @@
 #include "executor_interfaces/action/execute_task.hpp"
 #include "executor_interfaces/srv/update_knowledge.hpp"
 
+#include "executor_tools/Align.hpp"
 #include "executor_tools/Check.hpp"
 #include "executor_tools/GoTo.hpp"
 #include "executor_tools/Listen.hpp"
@@ -59,7 +60,7 @@ public:
     auto nodePtr = shared_from_this();
 
     // Definimos las funciones en desarrollo
-    std::vector<std::string> dev = {"align", "drop"};
+    std::vector<std::string> dev = { "drop"};
 
     // UNA sola instancia de HRI
     hri = std::make_shared<HRI>(nodePtr);
@@ -94,78 +95,84 @@ public:
 	unfocus_tool = std::make_shared<Unfocus>(nodePtr);
     saveloc = std::make_shared<Saveloc>(nodePtr);
     take_tool = std::make_shared<Take>(nodePtr, knowledge);
+    align_tool = std::make_shared<Align>(nodePtr);
 
     actionMap["listen"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return listen->run(arg, gh);
+        return listen->run(arg, gh);
         };
 
     actionMap["say"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return say->run(arg, gh);
+        return say->run(arg, gh);
         };
 
     actionMap["goto"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return go_to->run(arg, gh);
+        return go_to->run(arg, gh);
         };
     actionMap["check"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return check->run(arg, gh);
+        return check->run(arg, gh);
         };
     actionMap["save"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return save->run(arg, gh);
+        return save->run(arg, gh);
         };
     actionMap["follow"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return follow->run(arg, gh);
+        return follow->run(arg, gh);
         };
     actionMap["memorize_face"] = 
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return memorize_face->run(arg, gh);
+        return memorize_face->run(arg, gh);
         };
     actionMap["find"] = 
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-    return find->run(arg, gh);
+        return find->run(arg, gh);
         };
     actionMap["point"] =   
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-    return point_tool->run(arg, gh);
+        return point_tool->run(arg, gh);
         };
     actionMap["describe"] = 
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-    return describe_tool->run(arg, gh);
+        return describe_tool->run(arg, gh);
         };
 	actionMap["focus"] = 
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-    return focus_tool->run(arg, gh);
+        return focus_tool->run(arg, gh);
         };
 	actionMap["unfocus"] = 
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-    return unfocus_tool->run(arg, gh);
+        return unfocus_tool->run(arg, gh);
         };
     actionMap["saveloc"] = 
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-    return saveloc->run(arg, gh);
+        return saveloc->run(arg, gh);
         };
     actionMap["take"] = 
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-    return take_tool->run(arg, gh);
+        return take_tool->run(arg, gh);
+        };
+    actionMap["align"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+    return align_tool->run(arg, gh);
         };
 
     /* ===================== Registro automático para funciones en desarrollo ===================== */
@@ -324,6 +331,7 @@ private:
   std::shared_ptr<Unfocus> unfocus_tool;
   std::shared_ptr<Saveloc> saveloc;
   std::shared_ptr<Take> take_tool;
+  std::shared_ptr<Align> align_tool;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
