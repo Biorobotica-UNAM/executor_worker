@@ -94,7 +94,7 @@ public:
     focus_tool = std::make_shared<Focus>(nodePtr);
 	unfocus_tool = std::make_shared<Unfocus>(nodePtr);
     saveloc = std::make_shared<Saveloc>(nodePtr);
-    take_tool = std::make_shared<Take>(nodePtr, knowledge);
+    take_tool = std::make_shared<Take>(nodePtr);
     align_tool = std::make_shared<Align>(nodePtr);
 
     actionMap["listen"] =
