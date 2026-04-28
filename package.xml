@@ -26,8 +26,8 @@
   <depend>known_locations_interfaces</depend>
   <depend>clips_interfaces</depend>
   <depend>manipulation_planner_interfaces</depend>
-  <!--<depend>faces_interfaces</depend>
-  <depend>vision_interfaces</depend>-->
+  <depend>faces_interfaces</depend>
+  <depend>vision_interfaces</depend>
 
   <depend>hardware_tools</depend>
   <depend>hri_tools</depend>
@@ -35,7 +35,7 @@
   <depend>manipulation_tools</depend>
   <depend>planning_tools</depend>
   <depend>executor_tools</depend>
-  <!--<depend>vision_tools</depend>-->
+  <depend>vision_tools</depend>
 
   <depend>manipulation_planner</depend>
 

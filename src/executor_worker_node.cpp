@@ -8,7 +8,9 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 
 #include "executor_interfaces/action/execute_task.hpp"
+#include "executor_interfaces/srv/update_knowledge.hpp"
 
+#include "executor_tools/Align.hpp"
 #include "executor_tools/Check.hpp"
 #include "executor_tools/GoTo.hpp"
 #include "executor_tools/Listen.hpp"
@@ -19,6 +21,12 @@
 #include "executor_tools/MemorizeFace.hpp" 
 #include "executor_tools/Find.hpp"
 #include "executor_tools/Point.hpp"
+#include "executor_tools/Describe.hpp"
+#include "executor_tools/Focus.hpp"
+#include "executor_tools/Unfocus.hpp"
+#include "executor_tools/Saveloc.hpp"
+#include "executor_tools/Take.hpp"
+
 #include "tasks_tools/Tasks.hpp" 
 
 #include "hardware_tools/Hardware.hpp"
@@ -52,7 +60,7 @@ public:
     auto nodePtr = shared_from_this();
 
     // Definimos las funciones en desarrollo
-    std::vector<std::string> dev = {"focus", "take", "align", "drop"};
+    std::vector<std::string> dev = { "drop"};
 
     // UNA sola instancia de HRI
     hri = std::make_shared<HRI>(nodePtr);
@@ -79,58 +87,92 @@ public:
     check = std::make_shared<Check>(nodePtr, hardware);
     save = std::make_shared<Save>(nodePtr, knowledge);
     follow = std::make_shared<Follow>(nodePtr);
-    memorize_face = std::make_shared<MemorizeFace>(nodePtr, vision);
+    memorize_face = std::make_shared<MemorizeFace>(nodePtr, vision, knowledge);
     find = std::make_shared<Find>(nodePtr, tasks,knowledge);
     point_tool = std::make_shared<Point>(nodePtr, hardware);
+    describe_tool = std::make_shared<Describe>(nodePtr, knowledge);
+    focus_tool = std::make_shared<Focus>(nodePtr);
+	unfocus_tool = std::make_shared<Unfocus>(nodePtr);
+    saveloc = std::make_shared<Saveloc>(nodePtr);
+    take_tool = std::make_shared<Take>(nodePtr, knowledge);
+    align_tool = std::make_shared<Align>(nodePtr);
 
     actionMap["listen"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return listen->run(arg, gh);
+        return listen->run(arg, gh);
         };
 
     actionMap["say"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return say->run(arg, gh);
+        return say->run(arg, gh);
         };
 
     actionMap["goto"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return go_to->run(arg, gh);
+        return go_to->run(arg, gh);
         };
     actionMap["check"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return check->run(arg, gh);
+        return check->run(arg, gh);
         };
     actionMap["save"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return save->run(arg, gh);
+        return save->run(arg, gh);
         };
     actionMap["follow"] =
         [this](const std::string &arg,
                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          return follow->run(arg, gh);
+        return follow->run(arg, gh);
         };
     actionMap["memorize_face"] = 
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-          // Resolvemos el label (ej: "name_1" -> "john")
-          std::string real_name = knowledge->getNameFromLabel(arg);
-          return memorize_face->run(real_name, gh);
+        return memorize_face->run(arg, gh);
         };
     actionMap["find"] = 
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-    return find->run(arg, gh);
+        return find->run(arg, gh);
         };
     actionMap["point"] =   
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-    return point_tool->run(arg, gh);
+        return point_tool->run(arg, gh);
+        };
+    actionMap["describe"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+        return describe_tool->run(arg, gh);
+        };
+	actionMap["focus"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+        return focus_tool->run(arg, gh);
+        };
+	actionMap["unfocus"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+        return unfocus_tool->run(arg, gh);
+        };
+    actionMap["saveloc"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+        return saveloc->run(arg, gh);
+        };
+    actionMap["take"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+        return take_tool->run(arg, gh);
+        };
+    actionMap["align"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+    return align_tool->run(arg, gh);
         };
 
     /* ===================== Registro automático para funciones en desarrollo ===================== */
@@ -156,6 +198,25 @@ public:
             );
         };
     }
+
+    update_knowledge_service = this->create_service<executor_interfaces::srv::UpdateKnowledge>(
+        "/knowledge/update_label",
+        [this](const std::shared_ptr<executor_interfaces::srv::UpdateKnowledge::Request> request,
+              std::shared_ptr<executor_interfaces::srv::UpdateKnowledge::Response> response) {
+            
+            RCLCPP_INFO(this->get_logger(), "External update request: %s = %s", 
+                        request->label.c_str(), request->value.c_str());
+            
+            // Llamamos a la nueva función que pusimos en Knowledge.hpp
+            response->success = knowledge->updateFromService(request->label, request->value);
+            
+            if (response->success) {
+                response->message = "Label " + request->label + " updated in RAM and Disk";
+            } else {
+                response->message = "Failed to update label";
+            }
+        }
+    );
   }
 
 private:
@@ -180,51 +241,75 @@ private:
   /* ===================== EXECUTION ===================== */
 
   void execute(const std::shared_ptr<GoalHandleExecuteTask> goalHandle) {
+    // 1. Verificación de seguridad inicial
+    if (!goalHandle) {
+        RCLCPP_ERROR(this->get_logger(), "Received a null goalHandle. Aborting execution.");
+        return;
+    }
+
     const auto goal = goalHandle->get_goal();
     const auto &step = goal->task;
-
     const std::string argument = step.args.empty() ? "" : step.args[0];
 
     bool success = false;
     std::string message;
 
-    auto it = actionMap.find(step.action);
+    // 2. Envolvemos TODO en un try-catch para atrapar el SegFault antes de que mate al proceso
+    try {
+        auto it = actionMap.find(step.action);
 
-    if (it != actionMap.end()) {
-      success = it->second(argument, goalHandle);
-      message = success ? "Execution authorized" : "Execution rejected";
-    } else {
-      // Si la acción no es válida, mandamos el authorize con los parámetros que pediste
-      Executor report_executor(shared_from_this());
-      
-      report_executor.authorize(
-          step.action,
-          argument,
-          "reject",
-          "Action not valid: " + step.action
-      );
-
-      success = false;
-      message = "Unknown action: " + step.action;
+        if (it != actionMap.end()) {
+            RCLCPP_INFO(this->get_logger(), "Executing action: %s", step.action.c_str());
+            
+            // Llamada a la Tool (Find, Listen, etc.)
+            success = it->second(argument, goalHandle);
+            
+            message = success ? "Execution authorized" : "Execution rejected/failed";
+        } else {
+            // Acción no válida
+            Executor report_executor(shared_from_this());
+            report_executor.authorize(step.action, argument, "reject", "Action not valid: " + step.action);
+            
+            success = false;
+            message = "Unknown action: " + step.action;
+        }
+    } 
+    catch (const std::exception &e) {
+        // SI ALGO TRUENA DENTRO DE LA TOOL, CAE AQUÍ Y EL WORKER SIGUE VIVO
+        RCLCPP_ERROR(this->get_logger(), "CRITICAL ERROR in Tool '%s': %s", step.action.c_str(), e.what());
+        success = false;
+        message = "Tool crashed internaly: " + std::string(e.what());
+    }
+    catch (...) {
+        // Atrapa errores raros que no son excepciones estándar
+        RCLCPP_ERROR(this->get_logger(), "UNKNOWN CRITICAL ERROR in Tool '%s'", step.action.c_str());
+        success = false;
+        message = "Tool caused an unknown memory error.";
     }
 
+    // 3. Responder al Action Client (Supervisor) de forma segura
     auto result = std::make_shared<ExecuteTask::Result>();
-
     result->result.step_id = step.step_id;
     result->result.message = message;
 
-    if (success) {
-      result->result.status = executor_interfaces::msg::TaskResult::SUCCESS;
-      goalHandle->succeed(result);
+    // Verificamos si el goalHandle sigue activo antes de responder
+    if (goalHandle->is_active()) {
+        if (success) {
+            result->result.status = executor_interfaces::msg::TaskResult::SUCCESS;
+            goalHandle->succeed(result);
+        } else {
+            result->result.status = executor_interfaces::msg::TaskResult::FAILURE;
+            goalHandle->abort(result);
+        }
     } else {
-      result->result.status = executor_interfaces::msg::TaskResult::FAILURE;
-      goalHandle->abort(result);
+        RCLCPP_WARN(this->get_logger(), "GoalHandle is no longer active, skipping result publish.");
     }
   }
 
   /* ===================== MEMBERS ===================== */
 
   rclcpp_action::Server<ExecuteTask>::SharedPtr actionServer;
+  rclcpp::Service<executor_interfaces::srv::UpdateKnowledge>::SharedPtr update_knowledge_service;
 
   std::shared_ptr<HRI> hri;
   std::shared_ptr<Navigation> navigation;
@@ -241,6 +326,12 @@ private:
   std::shared_ptr<MemorizeFace> memorize_face;
   std::shared_ptr<Find> find;
   std::shared_ptr<Point> point_tool;
+  std::shared_ptr<Describe> describe_tool;
+  std::shared_ptr<Focus> focus_tool;
+  std::shared_ptr<Unfocus> unfocus_tool;
+  std::shared_ptr<Saveloc> saveloc;
+  std::shared_ptr<Take> take_tool;
+  std::shared_ptr<Align> align_tool;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
