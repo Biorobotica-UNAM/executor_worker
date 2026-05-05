@@ -26,6 +26,10 @@
 #include "executor_tools/Unfocus.hpp"
 #include "executor_tools/Saveloc.hpp"
 #include "executor_tools/Take.hpp"
+#include "executor_tools/FindObject.hpp"
+#include "executor_tools/FindPerson.hpp"
+#include "executor_tools/FindSeat.hpp"
+#include "executor_tools/FindWaving.hpp"
 
 #include "tasks_tools/Tasks.hpp" 
 
@@ -96,6 +100,10 @@ public:
     saveloc = std::make_shared<Saveloc>(nodePtr);
     take_tool = std::make_shared<Take>(nodePtr, knowledge);
     align_tool = std::make_shared<Align>(nodePtr);
+    find_object_tool = std::make_shared<FindObject>(nodePtr, tasks, knowledge);
+    find_person_tool = std::make_shared<FindPerson>(nodePtr, tasks, knowledge);
+    find_seat_tool   = std::make_shared<FindSeat>(nodePtr, tasks, knowledge);
+    find_waving_tool = std::make_shared<FindWaving>(nodePtr, tasks, knowledge);
 
     actionMap["listen"] =
         [this](const std::string &arg,
@@ -172,7 +180,27 @@ public:
     actionMap["align"] = 
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-    return align_tool->run(arg, gh);
+        return align_tool->run(arg, gh);
+        };
+    actionMap["find_object"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+        return find_object_tool->run(arg, gh);
+        };
+    actionMap["find_person"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+        return find_person_tool->run(arg, gh);
+        };
+    actionMap["find_seat"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+        return find_seat_tool->run(arg, gh);
+        };
+    actionMap["find_waving"] = 
+        [this](const std::string &arg, 
+                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
+        return find_waving_tool->run(arg, gh);
         };
 
     /* ===================== Registro automático para funciones en desarrollo ===================== */
@@ -332,6 +360,10 @@ private:
   std::shared_ptr<Saveloc> saveloc;
   std::shared_ptr<Take> take_tool;
   std::shared_ptr<Align> align_tool;
+  std::shared_ptr<FindObject> find_object_tool;
+  std::shared_ptr<FindPerson> find_person_tool;
+  std::shared_ptr<FindSeat> find_seat_tool;
+  std::shared_ptr<FindWaving> find_waving_tool;
 
   using ActionFunction = std::function<bool(
       const std::string &, const std::shared_ptr<GoalHandleExecuteTask> &)>;
