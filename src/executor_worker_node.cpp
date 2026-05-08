@@ -19,7 +19,6 @@
 #include "executor_tools/Follow.hpp"
 #include "executor_tools/Executor.hpp" 
 #include "executor_tools/MemorizeFace.hpp" 
-#include "executor_tools/Find.hpp"
 #include "executor_tools/Point.hpp"
 #include "executor_tools/Describe.hpp"
 #include "executor_tools/Focus.hpp"
@@ -92,7 +91,6 @@ public:
     save = std::make_shared<Save>(nodePtr, knowledge);
     follow = std::make_shared<Follow>(nodePtr);
     memorize_face = std::make_shared<MemorizeFace>(nodePtr, vision, knowledge);
-    find = std::make_shared<Find>(nodePtr, tasks,knowledge);
     point_tool = std::make_shared<Point>(nodePtr, hardware);
     describe_tool = std::make_shared<Describe>(nodePtr, knowledge);
     focus_tool = std::make_shared<Focus>(nodePtr);
@@ -141,11 +139,6 @@ public:
         [this](const std::string &arg, 
                 const std::shared_ptr<GoalHandleExecuteTask> &gh) {
         return memorize_face->run(arg, gh);
-        };
-    actionMap["find"] = 
-        [this](const std::string &arg, 
-                const std::shared_ptr<GoalHandleExecuteTask> &gh) {
-        return find->run(arg, gh);
         };
     actionMap["point"] =   
         [this](const std::string &arg, 
@@ -352,7 +345,6 @@ private:
   std::shared_ptr<Save> save;
   std::shared_ptr<Follow> follow;
   std::shared_ptr<MemorizeFace> memorize_face;
-  std::shared_ptr<Find> find;
   std::shared_ptr<Point> point_tool;
   std::shared_ptr<Describe> describe_tool;
   std::shared_ptr<Focus> focus_tool;
