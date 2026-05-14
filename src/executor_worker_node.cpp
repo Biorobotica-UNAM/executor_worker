@@ -10,8 +10,8 @@
 #include "executor_interfaces/action/execute_task.hpp"
 #include "executor_interfaces/msg/task_result.hpp"
 
+#include "executor_tools/Result.hpp"
 #include "executor_tools/Say.hpp"
-#include "executor_tools/ToolResult.hpp"
 
 #include "hri_tools/HRI.hpp"
 
@@ -24,7 +24,7 @@ public:
     using ExecuteTask    = executor_interfaces::action::ExecuteTask;
     using GoalHandle     = rclcpp_action::ServerGoalHandle<ExecuteTask>;
     using TaskResult     = executor_interfaces::msg::TaskResult;
-    using ActionFunction = std::function<ToolResult(
+    using ActionFunction = std::function<Result(
         const std::string&, const std::shared_ptr<GoalHandle>&)>;
 
     ExecutorWorkerNode() : Node("executor_worker_node")
@@ -87,7 +87,7 @@ private:
         const auto& step     = gh->get_goal()->task;
         const std::string arg = step.args.empty() ? "" : step.args[0];
 
-        ToolResult tr{false, "FAILED", "unknown_action: " + step.action};
+        Result tr{false, "FAILED", "unknown_action: " + step.action};
 
         try {
             auto it = actionMap_.find(step.action);
