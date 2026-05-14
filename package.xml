@@ -4,43 +4,25 @@
   <version>0.1.0</version>
   <description>Actions for RoboCup@HOME 2026</description>
 
-  <maintainer email="marco.soriano5102@comunidad.unam.mx">
-    Marco Soriano
-  </maintainer>
+  <maintainer email="marco.soriano5102@comunidad.unam.mx">Marco Soriano</maintainer>
 
   <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <!-- C++ / Build -->
   <depend>rclcpp</depend>
   <depend>rclcpp_action</depend>
-  <depend>std_msgs</depend>
-  <depend>std_srvs</depend>
-  <depend>sensor_msgs</depend>
-  <depend>trajectory_msgs</depend>
-  <depend>tf2_ros</depend>
-
-  <depend>listener_interfaces</depend>
-  <depend>talker_interfaces</depend>
+ 
+  <!-- Interfaces -->
   <depend>executor_interfaces</depend>
-  <depend>known_locations_interfaces</depend>
-  <depend>clips_interfaces</depend>
-  <depend>manipulation_planner_interfaces</depend>
-  <depend>faces_interfaces</depend>
-  <depend>vision_interfaces</depend>
-
-  <depend>hardware_tools</depend>
-  <depend>hri_tools</depend>
-  <depend>navigation_tools</depend>
-  <depend>manipulation_tools</depend>
-  <depend>planning_tools</depend>
+ 
+  <!-- Tools -->
   <depend>executor_tools</depend>
-  <depend>vision_tools</depend>
 
-  <depend>manipulation_planner</depend>
-
-  <depend>nlohmann_json</depend>
-  <depend>vosk_speech_recognition</depend>
+  <!-- Test -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
