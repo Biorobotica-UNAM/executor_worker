@@ -67,7 +67,7 @@ public:
 
 		actionMap_["check"] =
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                return check->run(arg, gh);
+                return check_->run(arg, gh);
             };
     }
 
