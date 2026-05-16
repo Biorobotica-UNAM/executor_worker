@@ -14,6 +14,7 @@
 #include "executor_tools/Say.hpp"
 #include "executor_tools/GoTo.hpp"
 #include "executor_tools/Check.hpp"
+#include "executor_tools/Point.hpp"
 
 #include "hri_tools/HRI.hpp"
 #include "navigation_tools/Navigation.hpp"
@@ -54,6 +55,8 @@ public:
 
 		hardware_ = std::make_shared<Hardware>(node);
 		check_ = std::make_shared<Check>(node, hardware_);
+		point_ = std::make_shared<Point>(node, hardware_);
+		
 
         actionMap_["say"] =
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
@@ -68,6 +71,11 @@ public:
 		actionMap_["check"] =
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
                 return check_->run(arg, gh);
+            };
+
+		actionMap_["point"] =
+            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
+                return point_->run(arg, gh);
             };
     }
 
@@ -161,6 +169,7 @@ private:
 
     std::shared_ptr<Hardware> hardware_;
 	std::shared_ptr<Check> check_;
+	std::shared_ptr<Point> point_;
 
     std::unordered_map<std::string, ActionFunction> actionMap_;
 };
