@@ -13,9 +13,11 @@
 #include "executor_tools/Result.hpp"
 #include "executor_tools/Say.hpp"
 #include "executor_tools/GoTo.hpp"
+#include "executor_tools/Check.hpp"
 
 #include "hri_tools/HRI.hpp"
 #include "navigation_tools/Navigation.hpp"
+#include "hardware_tools/Hardware.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -50,6 +52,9 @@ public:
         navigation_ = std::make_shared<Navigation>(node);
 		go_to_ = std::make_shared<GoTo>(node, navigation_);
 
+		hardware_ = std::make_shared<Hardware>(node);
+		check_ = std::make_shared<Check>(node, hardware_);
+
         actionMap_["say"] =
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
                 return say_->run(arg, gh);
@@ -58,6 +63,11 @@ public:
 		actionMap_["go_to"] =
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
                 return go_to_->run(arg, gh);
+            };
+
+		actionMap_["check"] =
+            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
+                return check->run(arg, gh);
             };
     }
 
@@ -148,6 +158,9 @@ private:
 
     std::shared_ptr<Navigation> navigation_;
 	std::shared_ptr<GoTo> go_to_;
+
+    std::shared_ptr<Hardware> hardware_;
+	std::shared_ptr<Check> check_;
 
     std::unordered_map<std::string, ActionFunction> actionMap_;
 };
