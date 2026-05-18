@@ -61,7 +61,7 @@ public:
 		give_tool_ = std::make_shared<Give>(node, hardware_, hri_);
 
 		vision_ = std::make_shared<Vision>(node);
-		find_person_ = std::make_shared<FindPerson>(node, find_person_);
+		find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_);
 
         actionMap_["say"] =
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
