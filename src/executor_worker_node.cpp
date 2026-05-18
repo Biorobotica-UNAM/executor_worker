@@ -16,6 +16,7 @@
 #include "executor_tools/Check.hpp"
 #include "executor_tools/Point.hpp"
 #include "executor_tools/Give.hpp"
+#include "executor_tools/FindPerson.hpp"
 
 #include "hri_tools/HRI.hpp"
 #include "navigation_tools/Navigation.hpp"
@@ -59,6 +60,9 @@ public:
 		point_ = std::make_shared<Point>(node, hardware_);
 		give_tool_ = std::make_shared<Give>(node, hardware_, hri_);
 
+		vision_ = std::make_shared<Vision>(node);
+		find_person_ = std::make_shared<FindPerson>(node, find_person_);
+
         actionMap_["say"] =
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
                 return say_->run(arg, gh);
@@ -82,6 +86,11 @@ public:
         actionMap_["give"] =
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
                 return give_tool_->run(arg, gh);
+            };
+
+		actionMap_["find_person"] =
+            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
+                return find_person_->run(arg, gh);
             };
     }
 
@@ -177,6 +186,9 @@ private:
 	std::shared_ptr<Check> check_;
 	std::shared_ptr<Point> point_;
     std::shared_ptr<Give> give_tool_;
+
+	std::shared_ptr<Vision> vision_;
+	std::shared_ptr<FindPerson> find_person_;
 
     std::unordered_map<std::string, ActionFunction> actionMap_;
 };
