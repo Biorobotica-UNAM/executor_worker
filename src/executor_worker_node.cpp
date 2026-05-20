@@ -19,6 +19,7 @@
 #include "executor_tools/FindPerson.hpp"
 #include "executor_tools/Align.hpp"
 #include "executor_tools/FindObject.hpp"
+#include "executor_tools/Focus.hpp"
 #include "executor_tools/Receive.hpp"
 #include "executor_tools/Follow.hpp"
 #include "executor_tools/Take.hpp"
@@ -73,6 +74,7 @@ public:
 		find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_);
         align_ = std::make_shared<Align>(node, hardware_, vision_);
 		find_object_ = std::make_shared<FindObject>(node, hardware_, vision_);
+		focus_ = std::make_shared<FindObject>(node, hardware_, vision_);
         manipulation_ = std::make_shared<Manipulation>(node);
         take_ = std::make_shared<Take>(node, manipulation_);
 
@@ -114,6 +116,12 @@ public:
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
                 return find_object_->run(arg, gh);
             };
+
+		actionMap_["focus"] =
+            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
+                return focus_->run(arg, gh);
+            };
+
         actionMap_["receive"] =
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
                 return receive_tool_->run(arg, gh);
@@ -232,6 +240,7 @@ private:
 	std::shared_ptr<FindPerson> find_person_;
     std::shared_ptr<Align> align_;
 	std::shared_ptr<FindObject> find_object_;
+	std::shared_ptr<Focus> focus_;
     std::shared_ptr<Manipulation> manipulation_;
     std::shared_ptr<Take> take_;
 
