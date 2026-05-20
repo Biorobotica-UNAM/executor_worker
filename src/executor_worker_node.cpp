@@ -98,11 +98,12 @@ public:
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
                 return find_person_->run(arg, gh);
             };
-
+        
         actionMap_["align"] =
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
                 return align_->run(arg, gh);
-		actionMap_["find_object"] =
+            };
+        actionMap_["find_object"] =
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
                 return find_object_->run(arg, gh);
             };
@@ -110,6 +111,9 @@ public:
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
                 return receive_tool_->run(arg, gh);
             };
+
+        
+
     }
 
 private:
