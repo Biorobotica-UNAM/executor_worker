@@ -74,7 +74,7 @@ public:
 		find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_);
         align_ = std::make_shared<Align>(node, hardware_, vision_);
 		find_object_ = std::make_shared<FindObject>(node, hardware_, vision_);
-		focus_ = std::make_shared<FindObject>(node, hardware_, vision_);
+		focus_ = std::make_shared<Focus>(node, hardware_, vision_);
         manipulation_ = std::make_shared<Manipulation>(node);
         take_ = std::make_shared<Take>(node, manipulation_);
 
