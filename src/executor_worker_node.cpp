@@ -26,6 +26,8 @@
 #include "hri_tools/HRI.hpp"
 #include "navigation_tools/Navigation.hpp"
 #include "hardware_tools/Hardware.hpp"
+#include "manipulation_tools/Manipulation.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -71,6 +73,7 @@ public:
 		find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_);
         align_ = std::make_shared<Align>(node, hardware_, vision_);
 		find_object_ = std::make_shared<FindObject>(node, hardware_, vision_);
+        manipulation_ = std::make_shared<Manipulation>(node);
         take_ = std::make_shared<Take>(node, manipulation_);
 
         actionMap_["say"] =
@@ -122,7 +125,10 @@ public:
 
         actionMap_["take"] =
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                return take_->run(arg, gh);
+                geometry_msgs::msg::PoseStamped target_pose;
+                target_pose.header.frame_id = "base_link";
+                target_pose.header.stamp = this->now();
+                return take_->run(arg, target_pose, gh);
             };
 
     }
@@ -226,6 +232,7 @@ private:
 	std::shared_ptr<FindPerson> find_person_;
     std::shared_ptr<Align> align_;
 	std::shared_ptr<FindObject> find_object_;
+    std::shared_ptr<Manipulation> manipulation_;
     std::shared_ptr<Take> take_;
 
     std::unordered_map<std::string, ActionFunction> actionMap_;
