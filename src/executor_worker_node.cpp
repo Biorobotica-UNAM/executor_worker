@@ -20,6 +20,7 @@
 #include "executor_tools/Align.hpp"
 #include "executor_tools/FindObject.hpp"
 #include "executor_tools/Receive.hpp"
+#include "executor_tools/Follow.hpp"
 
 #include "hri_tools/HRI.hpp"
 #include "navigation_tools/Navigation.hpp"
@@ -63,6 +64,7 @@ public:
 		point_ = std::make_shared<Point>(node, hardware_);
 		give_tool_ = std::make_shared<Give>(node, hardware_, hri_);
 		receive_tool_ = std::make_shared<Receive>(node, hardware_, hri_);
+        follow_tool_ = std::make_shared<Follow>(node);
 
 		vision_ = std::make_shared<Vision>(node);
 		find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_);
@@ -110,6 +112,10 @@ public:
         actionMap_["receive"] =
             [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
                 return receive_tool_->run(arg, gh);
+            };
+        actionMap_["follow"] =
+            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
+                return follow_tool_->run(arg, gh);
             };
 
         
@@ -209,6 +215,7 @@ private:
 	std::shared_ptr<Point> point_;
     std::shared_ptr<Give> give_tool_;
     std::shared_ptr<Receive> receive_tool_;
+    std::shared_ptr<Follow> follow_tool_;
 
 	std::shared_ptr<Vision> vision_;
 	std::shared_ptr<FindPerson> find_person_;
