@@ -10,252 +10,257 @@
 #include "executor_interfaces/action/execute_task.hpp"
 #include "executor_interfaces/msg/task_result.hpp"
 
+#include "executor_tools/Align.hpp"
+#include "executor_tools/Check.hpp"
+#include "executor_tools/FindObject.hpp"
+#include "executor_tools/FindPerson.hpp"
+#include "executor_tools/Focus.hpp"
+#include "executor_tools/Follow.hpp"
+#include "executor_tools/Give.hpp"
+#include "executor_tools/GoTo.hpp"
+#include "executor_tools/Listen.hpp"
+#include "executor_tools/Point.hpp"
+#include "executor_tools/Receive.hpp"
 #include "executor_tools/Result.hpp"
 #include "executor_tools/Say.hpp"
-#include "executor_tools/GoTo.hpp"
-#include "executor_tools/Check.hpp"
-#include "executor_tools/Point.hpp"
-#include "executor_tools/Give.hpp"
-#include "executor_tools/FindPerson.hpp"
-#include "executor_tools/Align.hpp"
-#include "executor_tools/FindObject.hpp"
-#include "executor_tools/Focus.hpp"
-#include "executor_tools/Receive.hpp"
-#include "executor_tools/Follow.hpp"
 #include "executor_tools/Take.hpp"
 
-#include "hri_tools/HRI.hpp"
-#include "navigation_tools/Navigation.hpp"
-#include "hardware_tools/Hardware.hpp"
-#include "manipulation_tools/Manipulation.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
+#include "hardware_tools/Hardware.hpp"
+#include "hri_tools/HRI.hpp"
+#include "knowledge_tools/KNOWLEDGE.hpp"
+#include "manipulation_tools/Manipulation.hpp"
+#include "navigation_tools/Navigation.hpp"
+#include "planning_tools/Planning.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-class ExecutorWorkerNode : public rclcpp::Node
-{
+class ExecutorWorkerNode : public rclcpp::Node {
 public:
-    using ExecuteTask    = executor_interfaces::action::ExecuteTask;
-    using GoalHandle     = rclcpp_action::ServerGoalHandle<ExecuteTask>;
-    using TaskResult     = executor_interfaces::msg::TaskResult;
-    using ActionFunction = std::function<Result(
-        const std::string&, const std::shared_ptr<GoalHandle>&)>;
+  using ExecuteTask = executor_interfaces::action::ExecuteTask;
+  using GoalHandle = rclcpp_action::ServerGoalHandle<ExecuteTask>;
+  using TaskResult = executor_interfaces::msg::TaskResult;
+  using ActionFunction = std::function<Result(
+      const std::string &, const std::shared_ptr<GoalHandle> &)>;
 
-    ExecutorWorkerNode() : Node("executor_worker_node")
-    {
-        action_server_ = rclcpp_action::create_server<ExecuteTask>(
-            this, "/executor/execute_task",
-            std::bind(&ExecutorWorkerNode::handleGoal,     this, _1, _2),
-            std::bind(&ExecutorWorkerNode::handleCancel,   this, _1),
-            std::bind(&ExecutorWorkerNode::handleAccepted, this, _1));
+  ExecutorWorkerNode() : Node("executor_worker_node") {
+    action_server_ = rclcpp_action::create_server<ExecuteTask>(
+        this, "/executor/execute_task",
+        std::bind(&ExecutorWorkerNode::handleGoal, this, _1, _2),
+        std::bind(&ExecutorWorkerNode::handleCancel, this, _1),
+        std::bind(&ExecutorWorkerNode::handleAccepted, this, _1));
 
-        RCLCPP_INFO(get_logger(), "ExecutorWorkerNode ready.");
-    }
+    RCLCPP_INFO(get_logger(), "ExecutorWorkerNode ready.");
+  }
 
-    void initTools()
-    {
-        auto node = shared_from_this();
+  void initTools() {
+    auto node = shared_from_this();
 
-        hri_ = std::make_shared<HRI>(node);
-        say_ = std::make_shared<Say>(node, hri_);
+    planning_ = std::make_shared<Planning>(node);
+    knowledge_ = std::make_shared<KNOWLEDGE>(node);
 
-        navigation_ = std::make_shared<Navigation>(node);
-		go_to_ = std::make_shared<GoTo>(node, navigation_);
+    hri_ = std::make_shared<HRI>(node);
+    say_ = std::make_shared<Say>(node, hri_);
+    listen_ = std::make_shared<Listen>(node, hri_, planning_, knowledge_);
 
-		hardware_ = std::make_shared<Hardware>(node);
-		check_ = std::make_shared<Check>(node, hardware_);
-		point_ = std::make_shared<Point>(node, hardware_);
-		give_tool_ = std::make_shared<Give>(node, hardware_, hri_);
-		receive_tool_ = std::make_shared<Receive>(node, hardware_, hri_);
-        follow_tool_ = std::make_shared<Follow>(node);
+    navigation_ = std::make_shared<Navigation>(node);
+    go_to_ = std::make_shared<GoTo>(node, navigation_);
 
-		vision_ = std::make_shared<Vision>(node);
-		find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_);
-        align_ = std::make_shared<Align>(node, hardware_, vision_);
-		find_object_ = std::make_shared<FindObject>(node, hardware_, vision_);
-		focus_ = std::make_shared<Focus>(node, vision_);
-        manipulation_ = std::make_shared<Manipulation>(node);
-        take_ = std::make_shared<Take>(node, manipulation_);
+    hardware_ = std::make_shared<Hardware>(node);
+    check_ = std::make_shared<Check>(node, hardware_);
+    point_ = std::make_shared<Point>(node, hardware_);
+    give_tool_ = std::make_shared<Give>(node, hardware_, hri_);
+    receive_tool_ = std::make_shared<Receive>(node, hardware_, hri_);
+    follow_tool_ = std::make_shared<Follow>(node);
 
-        actionMap_["say"] =
-            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                return say_->run(arg, gh);
-            };
+    vision_ = std::make_shared<Vision>(node);
+    find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_);
+    align_ = std::make_shared<Align>(node, hardware_, vision_);
+    find_object_ = std::make_shared<FindObject>(node, hardware_, vision_);
+    focus_ = std::make_shared<Focus>(node, vision_);
+    manipulation_ = std::make_shared<Manipulation>(node);
+    take_ = std::make_shared<Take>(node, manipulation_);
 
-		actionMap_["go_to"] =
-            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                return go_to_->run(arg, gh);
-            };
+    actionMap_["say"] = [this](const std::string &arg,
+                               const std::shared_ptr<GoalHandle> &gh) {
+      return say_->run(arg, gh);
+    };
 
-		actionMap_["check"] =
-            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                return check_->run(arg, gh);
-            };
+    actionMap_["listen"] = [this](const std::string &arg,
+                                  const std::shared_ptr<GoalHandle> &gh) {
+      return listen_->run(arg, gh);
+    };
 
-		actionMap_["point"] =
-            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                return point_->run(arg, gh);
-            };
+    actionMap_["go_to"] = [this](const std::string &arg,
+                                 const std::shared_ptr<GoalHandle> &gh) {
+      return go_to_->run(arg, gh);
+    };
 
-        actionMap_["give"] =
-            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                return give_tool_->run(arg, gh);
-            };
+    actionMap_["check"] = [this](const std::string &arg,
+                                 const std::shared_ptr<GoalHandle> &gh) {
+      return check_->run(arg, gh);
+    };
 
-		actionMap_["find_person"] =
-            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                return find_person_->run(arg, gh);
-            };
-        
-        actionMap_["align"] =
-            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                return align_->run(arg, gh);
-            };
-        actionMap_["find_object"] =
-            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                return find_object_->run(arg, gh);
-            };
+    actionMap_["point"] = [this](const std::string &arg,
+                                 const std::shared_ptr<GoalHandle> &gh) {
+      return point_->run(arg, gh);
+    };
 
-		actionMap_["focus"] =
-            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                return focus_->run(arg, gh);
-            };
+    actionMap_["give"] = [this](const std::string &arg,
+                                const std::shared_ptr<GoalHandle> &gh) {
+      return give_tool_->run(arg, gh);
+    };
 
-        actionMap_["receive"] =
-            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                return receive_tool_->run(arg, gh);
-            };
-        actionMap_["follow"] =
-            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                return follow_tool_->run(arg, gh);
-            };
+    actionMap_["find_person"] = [this](const std::string &arg,
+                                       const std::shared_ptr<GoalHandle> &gh) {
+      return find_person_->run(arg, gh);
+    };
 
-        actionMap_["take"] =
-            [this](const std::string& arg, const std::shared_ptr<GoalHandle>& gh) {
-                geometry_msgs::msg::PoseStamped target_pose;
-                target_pose.header.frame_id = "base_link";
-                target_pose.header.stamp = this->now();
-                return take_->run(arg, target_pose, gh);
-            };
+    actionMap_["align"] = [this](const std::string &arg,
+                                 const std::shared_ptr<GoalHandle> &gh) {
+      return align_->run(arg, gh);
+    };
+    actionMap_["find_object"] = [this](const std::string &arg,
+                                       const std::shared_ptr<GoalHandle> &gh) {
+      return find_object_->run(arg, gh);
+    };
 
-    }
+    actionMap_["focus"] = [this](const std::string &arg,
+                                 const std::shared_ptr<GoalHandle> &gh) {
+      return focus_->run(arg, gh);
+    };
+
+    actionMap_["receive"] = [this](const std::string &arg,
+                                   const std::shared_ptr<GoalHandle> &gh) {
+      return receive_tool_->run(arg, gh);
+    };
+    actionMap_["follow"] = [this](const std::string &arg,
+                                  const std::shared_ptr<GoalHandle> &gh) {
+      return follow_tool_->run(arg, gh);
+    };
+
+    actionMap_["take"] = [this](const std::string &arg,
+                                const std::shared_ptr<GoalHandle> &gh) {
+      geometry_msgs::msg::PoseStamped target_pose;
+      target_pose.header.frame_id = "base_link";
+      target_pose.header.stamp = this->now();
+      return take_->run(arg, target_pose, gh);
+    };
+  }
 
 private:
+  // =========================================================
+  // Action callbacks
+  // =========================================================
+  rclcpp_action::GoalResponse
+  handleGoal(const rclcpp_action::GoalUUID &,
+             std::shared_ptr<const ExecuteTask::Goal>) {
+    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+  }
 
-    // =========================================================
-    // Action callbacks
-    // =========================================================
-    rclcpp_action::GoalResponse handleGoal(
-        const rclcpp_action::GoalUUID&,
-        std::shared_ptr<const ExecuteTask::Goal>)
-    {
-        return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+  rclcpp_action::CancelResponse
+  handleCancel(const std::shared_ptr<GoalHandle>) {
+    return rclcpp_action::CancelResponse::ACCEPT;
+  }
+
+  void handleAccepted(const std::shared_ptr<GoalHandle> gh) {
+    std::thread(&ExecutorWorkerNode::execute, this, gh).detach();
+  }
+
+  // =========================================================
+  // Execution
+  // =========================================================
+  void execute(const std::shared_ptr<GoalHandle> gh) {
+    if (!gh) {
+      RCLCPP_ERROR(get_logger(), "Null goalHandle — aborting.");
+      return;
     }
 
-    rclcpp_action::CancelResponse handleCancel(
-        const std::shared_ptr<GoalHandle>)
-    {
-        return rclcpp_action::CancelResponse::ACCEPT;
+    const auto &step = gh->get_goal()->task;
+    const std::string arg = step.args.empty() ? "" : step.args[0];
+
+    Result tr{false, "FAILED", "unknown_action: " + step.action};
+
+    try {
+      auto it = actionMap_.find(step.action);
+
+      if (it != actionMap_.end()) {
+        RCLCPP_INFO(get_logger(), "Action: %s  arg: %s", step.action.c_str(),
+                    arg.c_str());
+        tr = it->second(arg, gh);
+      } else {
+        RCLCPP_WARN(get_logger(), "Unknown action: %s", step.action.c_str());
+        tr = {false, "FAILED", "unknown_action: " + step.action};
+      }
+    } catch (const std::exception &e) {
+      RCLCPP_ERROR(get_logger(), "Tool '%s' threw: %s", step.action.c_str(),
+                   e.what());
+      tr = {false, "FAILED", std::string("exception: ") + e.what()};
+    } catch (...) {
+      RCLCPP_ERROR(get_logger(), "Tool '%s' caused unknown error.",
+                   step.action.c_str());
+      tr = {false, "FAILED", "unknown_error"};
     }
 
-    void handleAccepted(const std::shared_ptr<GoalHandle> gh)
-    {
-        std::thread(&ExecutorWorkerNode::execute, this, gh).detach();
+    auto result = std::make_shared<ExecuteTask::Result>();
+    result->result.step_id = step.step_id;
+    result->result.message = tr.message;
+    result->result.status =
+        tr.success ? TaskResult::SUCCESS : TaskResult::FAILURE;
+
+    if (!gh->is_active()) {
+      RCLCPP_WARN(get_logger(),
+                  "GoalHandle no longer active — skipping result.");
+      return;
     }
 
-    // =========================================================
-    // Execution
-    // =========================================================
-    void execute(const std::shared_ptr<GoalHandle> gh)
-    {
-        if (!gh) {
-            RCLCPP_ERROR(get_logger(), "Null goalHandle — aborting.");
-            return;
-        }
+    if (tr.success)
+      gh->succeed(result);
+    else
+      gh->abort(result);
+  }
 
-        const auto& step     = gh->get_goal()->task;
-        const std::string arg = step.args.empty() ? "" : step.args[0];
+  // =========================================================
+  // Members
+  // =========================================================
+  rclcpp_action::Server<ExecuteTask>::SharedPtr action_server_;
 
-        Result tr{false, "FAILED", "unknown_action: " + step.action};
+  std::shared_ptr<Planning> planning_;
+  std::shared_ptr<KNOWLEDGE> knowledge_;
+  std::shared_ptr<HRI> hri_;
+  std::shared_ptr<Say> say_;
+  std::shared_ptr<Listen> listen_;
 
-        try {
-            auto it = actionMap_.find(step.action);
+  std::shared_ptr<Navigation> navigation_;
+  std::shared_ptr<GoTo> go_to_;
 
-            if (it != actionMap_.end()) {
-                RCLCPP_INFO(get_logger(), "Action: %s  arg: %s",
-                            step.action.c_str(), arg.c_str());
-                tr = it->second(arg, gh);
-            } else {
-                RCLCPP_WARN(get_logger(), "Unknown action: %s", step.action.c_str());
-                tr = {false, "FAILED", "unknown_action: " + step.action};
-            }
-        }
-        catch (const std::exception& e) {
-            RCLCPP_ERROR(get_logger(), "Tool '%s' threw: %s",
-                         step.action.c_str(), e.what());
-            tr = {false, "FAILED", std::string("exception: ") + e.what()};
-        }
-        catch (...) {
-            RCLCPP_ERROR(get_logger(), "Tool '%s' caused unknown error.",
-                         step.action.c_str());
-            tr = {false, "FAILED", "unknown_error"};
-        }
+  std::shared_ptr<Hardware> hardware_;
+  std::shared_ptr<Check> check_;
+  std::shared_ptr<Point> point_;
+  std::shared_ptr<Give> give_tool_;
+  std::shared_ptr<Receive> receive_tool_;
+  std::shared_ptr<Follow> follow_tool_;
 
-        auto result          = std::make_shared<ExecuteTask::Result>();
-        result->result.step_id = step.step_id;
-        result->result.message = tr.message;
-        result->result.status  = tr.success
-            ? TaskResult::SUCCESS
-            : TaskResult::FAILURE;
+  std::shared_ptr<Vision> vision_;
+  std::shared_ptr<FindPerson> find_person_;
+  std::shared_ptr<Align> align_;
+  std::shared_ptr<FindObject> find_object_;
+  std::shared_ptr<Focus> focus_;
+  std::shared_ptr<Manipulation> manipulation_;
+  std::shared_ptr<Take> take_;
 
-        if (!gh->is_active()) {
-            RCLCPP_WARN(get_logger(), "GoalHandle no longer active — skipping result.");
-            return;
-        }
-
-        if (tr.success) gh->succeed(result);
-        else            gh->abort(result);
-    }
-
-    // =========================================================
-    // Members
-    // =========================================================
-    rclcpp_action::Server<ExecuteTask>::SharedPtr action_server_;
-
-    std::shared_ptr<HRI> hri_;
-    std::shared_ptr<Say> say_;
-
-    std::shared_ptr<Navigation> navigation_;
-	std::shared_ptr<GoTo> go_to_;
-
-    std::shared_ptr<Hardware> hardware_;
-	std::shared_ptr<Check> check_;
-	std::shared_ptr<Point> point_;
-    std::shared_ptr<Give> give_tool_;
-    std::shared_ptr<Receive> receive_tool_;
-    std::shared_ptr<Follow> follow_tool_;
-
-	std::shared_ptr<Vision> vision_;
-	std::shared_ptr<FindPerson> find_person_;
-    std::shared_ptr<Align> align_;
-	std::shared_ptr<FindObject> find_object_;
-	std::shared_ptr<Focus> focus_;
-    std::shared_ptr<Manipulation> manipulation_;
-    std::shared_ptr<Take> take_;
-
-    std::unordered_map<std::string, ActionFunction> actionMap_;
+  std::unordered_map<std::string, ActionFunction> actionMap_;
 };
 
 // =========================================================
 // Main
 // =========================================================
-int main(int argc, char** argv)
-{
-    rclcpp::init(argc, argv);
-    auto node = std::make_shared<ExecutorWorkerNode>();
-    node->initTools();
-    rclcpp::spin(node);
-    rclcpp::shutdown();
-    return 0;
+int main(int argc, char **argv) {
+  rclcpp::init(argc, argv);
+  auto node = std::make_shared<ExecutorWorkerNode>();
+  node->initTools();
+  rclcpp::spin(node);
+  rclcpp::shutdown();
+  return 0;
 }
