@@ -28,7 +28,7 @@
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "hardware_tools/Hardware.hpp"
 #include "hri_tools/HRI.hpp"
-#include "knowledge_tools/KNOWLEDGE.hpp"
+#include "knowledge_tools/Knowledge.hpp"
 #include "manipulation_tools/Manipulation.hpp"
 #include "navigation_tools/Navigation.hpp"
 #include "planning_tools/Planning.hpp"
@@ -58,7 +58,7 @@ public:
     auto node = shared_from_this();
 
     planning_ = std::make_shared<Planning>(node);
-    knowledge_ = std::make_shared<KNOWLEDGE>(node);
+    knowledge_ = std::make_shared<Knowledge>(node);
 
     hri_ = std::make_shared<HRI>(node);
     say_ = std::make_shared<Say>(node, hri_);
@@ -227,7 +227,7 @@ private:
   rclcpp_action::Server<ExecuteTask>::SharedPtr action_server_;
 
   std::shared_ptr<Planning> planning_;
-  std::shared_ptr<KNOWLEDGE> knowledge_;
+  std::shared_ptr<Knowledge> knowledge_;
   std::shared_ptr<HRI> hri_;
   std::shared_ptr<Say> say_;
   std::shared_ptr<Listen> listen_;
