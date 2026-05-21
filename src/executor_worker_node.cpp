@@ -61,7 +61,7 @@ public:
     knowledge_ = std::make_shared<Knowledge>(node);
 
     hri_ = std::make_shared<HRI>(node);
-    say_ = std::make_shared<Say>(node, hri_);
+    say_ = std::make_shared<Say>(node, hri_, knowledge_);
     listen_ = std::make_shared<Listen>(node, hri_, planning_, knowledge_);
 
     navigation_ = std::make_shared<Navigation>(node);
