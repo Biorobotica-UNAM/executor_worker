@@ -11,6 +11,7 @@
 #include "executor_interfaces/msg/task_result.hpp"
 
 #include "executor_tools/Align.hpp"
+#include "executor_tools/Approach.hpp"
 #include "executor_tools/Check.hpp"
 #include "executor_tools/FindObject.hpp"
 #include "executor_tools/FindPerson.hpp"
@@ -82,6 +83,8 @@ public:
     manipulation_ = std::make_shared<Manipulation>(node);
     take_ = std::make_shared<Take>(node, manipulation_);
 
+    approach_ = std::make_shared<Approach>(node, hardware_, vision_);
+
     actionMap_["say"] = [this](const std::string &arg,
                                const std::shared_ptr<GoalHandle> &gh) {
       return say_->run(arg, gh);
@@ -138,6 +141,11 @@ public:
     actionMap_["follow"] = [this](const std::string &arg,
                                   const std::shared_ptr<GoalHandle> &gh) {
       return follow_tool_->run(arg, gh);
+    };
+
+    actionMap_["approach"] = [this](const std::string &arg,
+                                    const std::shared_ptr<GoalHandle> &gh) {
+      return approach_->run(arg, gh);
     };
 
     actionMap_["take"] = [this](const std::string &arg,
@@ -249,6 +257,8 @@ private:
   std::shared_ptr<Focus> focus_;
   std::shared_ptr<Manipulation> manipulation_;
   std::shared_ptr<Take> take_;
+
+  std::shared_ptr<Approach> approach_;
 
   std::unordered_map<std::string, ActionFunction> actionMap_;
 };
