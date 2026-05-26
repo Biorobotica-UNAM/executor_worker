@@ -77,7 +77,7 @@ public:
     follow_tool_ = std::make_shared<Follow>(node);
 
     vision_ = std::make_shared<Vision>(node);
-    find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_);
+    find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_, knowledge_);
     align_ = std::make_shared<Align>(node, hardware_, vision_);
     drop_ = std::make_shared<Drop>(node, hardware_);    
     find_object_ = std::make_shared<FindObject>(node, hardware_, vision_, knowledge_);
