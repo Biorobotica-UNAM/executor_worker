@@ -84,7 +84,6 @@ public:
     focus_ = std::make_shared<Focus>(node, vision_);
     manipulation_ = std::make_shared<Manipulation>(node);
     take_ = std::make_shared<Take>(node, manipulation_, hardware_, knowledge_);
-    take_ = std::make_shared<Take>(node, manipulation_, hardware_);
 
     approach_ = std::make_shared<Approach>(node, hardware_, vision_);
 
