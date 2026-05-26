@@ -159,10 +159,7 @@ public:
 
     actionMap_["take"] = [this](const std::string &arg,
                                 const std::shared_ptr<GoalHandle> &gh) {
-      geometry_msgs::msg::PoseStamped target_pose;
-      target_pose.header.frame_id = "base_link";
-      target_pose.header.stamp = this->now();
-      return take_->run(arg, target_pose, gh);
+      return take_->run(arg, gh);
     };
   }
 
