@@ -16,6 +16,7 @@
 #include "executor_tools/Drop.hpp"
 #include "executor_tools/FindObject.hpp"
 #include "executor_tools/FindPerson.hpp"
+#include "executor_tools/FindPose.hpp"
 #include "executor_tools/Focus.hpp"
 #include "executor_tools/Follow.hpp"
 #include "executor_tools/Give.hpp"
@@ -78,6 +79,7 @@ public:
 
     vision_ = std::make_shared<Vision>(node);
     find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_, knowledge_);
+    find_pose_ = std::make_shared<FindPose>(node, hardware_, hri_, knowledge_);
     align_ = std::make_shared<Align>(node, hardware_, vision_);
     drop_ = std::make_shared<Drop>(node, hardware_);    
     find_object_ = std::make_shared<FindObject>(node, hardware_, vision_, knowledge_);
@@ -159,6 +161,11 @@ public:
     actionMap_["take"] = [this](const std::string &arg,
                                 const std::shared_ptr<GoalHandle> &gh) {
       return take_->run(arg, gh);
+    };
+
+    actionMap_["find_pose"] = [this](const std::string &arg,
+                                  const std::shared_ptr<GoalHandle> &gh) {
+      return find_pose_->run(arg, gh);
     };
   }
 
@@ -257,6 +264,7 @@ private:
 
   std::shared_ptr<Vision> vision_;
   std::shared_ptr<FindPerson> find_person_;
+  std::shared_ptr<FindPose> find_pose_;
   std::shared_ptr<Align> align_;  
   std::shared_ptr<Drop> drop_;
   std::shared_ptr<FindObject> find_object_;
