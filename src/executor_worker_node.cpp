@@ -85,7 +85,7 @@ public:
     find_object_ = std::make_shared<FindObject>(node, hardware_, vision_, knowledge_);
     focus_ = std::make_shared<Focus>(node, vision_);
     manipulation_ = std::make_shared<Manipulation>(node);
-    take_ = std::make_shared<Take>(node, manipulation_, hardware_, knowledge_);
+    take_ = std::make_shared<Take>(node, manipulation_, hardware_, knowledge_, hri_);
 
     approach_ = std::make_shared<Approach>(node, hardware_, vision_);
 
