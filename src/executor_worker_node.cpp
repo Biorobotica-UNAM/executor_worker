@@ -73,9 +73,9 @@ public:
     hardware_ = std::make_shared<Hardware>(node);
     check_ = std::make_shared<Check>(node, hardware_);
     point_ = std::make_shared<Point>(node, hardware_);
-    give_tool_ = std::make_shared<Give>(node, hardware_, hri_);
-    receive_tool_ = std::make_shared<Receive>(node, hardware_, hri_);
-    follow_tool_ = std::make_shared<Follow>(node);
+    give_ = std::make_shared<Give>(node, hardware_, knowledge_, hri_);
+    receive_ = std::make_shared<Receive>(node, hardware_, hri_);
+    follow_ = std::make_shared<Follow>(node);
 
     vision_ = std::make_shared<Vision>(node);
     find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_, knowledge_);
@@ -116,7 +116,7 @@ public:
 
     actionMap_["give"] = [this](const std::string &arg,
                                 const std::shared_ptr<GoalHandle> &gh) {
-      return give_tool_->run(arg, gh);
+      return give_->run(arg, gh);
     };
 
     actionMap_["find_person"] = [this](const std::string &arg,
@@ -146,11 +146,11 @@ public:
 
     actionMap_["receive"] = [this](const std::string &arg,
                                    const std::shared_ptr<GoalHandle> &gh) {
-      return receive_tool_->run(arg, gh);
+      return receive_->run(arg, gh);
     };
     actionMap_["follow"] = [this](const std::string &arg,
                                   const std::shared_ptr<GoalHandle> &gh) {
-      return follow_tool_->run(arg, gh);
+      return follow_->run(arg, gh);
     };
 
     actionMap_["approach"] = [this](const std::string &arg,
@@ -258,9 +258,9 @@ private:
   std::shared_ptr<Hardware> hardware_;
   std::shared_ptr<Check> check_;
   std::shared_ptr<Point> point_;
-  std::shared_ptr<Give> give_tool_;
-  std::shared_ptr<Receive> receive_tool_;
-  std::shared_ptr<Follow> follow_tool_;
+  std::shared_ptr<Give> give_;
+  std::shared_ptr<Receive> receive_;
+  std::shared_ptr<Follow> follow_;
 
   std::shared_ptr<Vision> vision_;
   std::shared_ptr<FindPerson> find_person_;
