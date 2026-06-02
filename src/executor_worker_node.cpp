@@ -21,6 +21,8 @@
 #include "executor_tools/Follow.hpp"
 #include "executor_tools/Give.hpp"
 #include "executor_tools/GoTo.hpp"
+#include "executor_tools/GoToMapless.hpp"
+#include "executor_tools/Saveloc.hpp"
 #include "executor_tools/Listen.hpp"
 #include "executor_tools/Point.hpp"
 #include "executor_tools/Receive.hpp"
@@ -69,6 +71,8 @@ public:
 
     navigation_ = std::make_shared<Navigation>(node);
     go_to_ = std::make_shared<GoTo>(node, navigation_);
+    go_to_mapless_ = std::make_shared<GoToMapless>(node);
+    saveloc_ = std::make_shared<Saveloc>(node, navigation_);    
 
     hardware_ = std::make_shared<Hardware>(node);
     check_ = std::make_shared<Check>(node, hardware_);
@@ -102,6 +106,16 @@ public:
     actionMap_["go_to"] = [this](const std::string &arg,
                                  const std::shared_ptr<GoalHandle> &gh) {
       return go_to_->run(arg, gh);
+    };
+
+    actionMap_["goto_mapless"] = [this](const std::string &arg,
+                                        const std::shared_ptr<GoalHandle> &gh) {
+        return go_to_mapless_->run(arg, gh);
+    };
+
+    actionMap_["saveloc"] = [this](const std::string &arg,
+                                   const std::shared_ptr<GoalHandle> &gh) {
+      return saveloc_->run(arg, gh);
     };
 
     actionMap_["check"] = [this](const std::string &arg,
@@ -254,6 +268,8 @@ private:
 
   std::shared_ptr<Navigation> navigation_;
   std::shared_ptr<GoTo> go_to_;
+  std::shared_ptr<GoToMapless> go_to_mapless_;
+  std::shared_ptr<Saveloc> saveloc_;
 
   std::shared_ptr<Hardware> hardware_;
   std::shared_ptr<Check> check_;
