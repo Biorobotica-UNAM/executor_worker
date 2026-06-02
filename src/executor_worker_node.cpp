@@ -74,7 +74,7 @@ public:
     check_ = std::make_shared<Check>(node, hardware_);
     point_ = std::make_shared<Point>(node, hardware_);
     give_ = std::make_shared<Give>(node, hardware_, knowledge_, hri_);
-    receive_ = std::make_shared<Receive>(node, hardware_, hri_);
+    receive_ = std::make_shared<Receive>(node, hardware_, hri_, knowledge_);
     follow_ = std::make_shared<Follow>(node);
 
     vision_ = std::make_shared<Vision>(node);
