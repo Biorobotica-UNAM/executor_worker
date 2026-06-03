@@ -27,6 +27,7 @@
 #include "executor_tools/Result.hpp"
 #include "executor_tools/Say.hpp"
 #include "executor_tools/Take.hpp"
+#include "executor_tools/AnalyzeObjects.hpp"
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "hardware_tools/Hardware.hpp"
@@ -86,6 +87,7 @@ public:
     focus_ = std::make_shared<Focus>(node, vision_);
     manipulation_ = std::make_shared<Manipulation>(node);
     take_ = std::make_shared<Take>(node, manipulation_, hardware_, knowledge_, hri_);
+    analyze_objects_ = std::make_shared<AnalyzeObjects>(node, hardware_, vision_, knowledge_);
 
     approach_ = std::make_shared<Approach>(node, hardware_, vision_);
 
@@ -100,17 +102,17 @@ public:
     };
 
     actionMap_["go_to"] = [this](const std::string &arg,
-                                 const std::shared_ptr<GoalHandle> &gh) {
+                                  const std::shared_ptr<GoalHandle> &gh) {
       return go_to_->run(arg, gh);
     };
 
     actionMap_["check"] = [this](const std::string &arg,
-                                 const std::shared_ptr<GoalHandle> &gh) {
+                                  const std::shared_ptr<GoalHandle> &gh) {
       return check_->run(arg, gh);
     };
 
     actionMap_["point"] = [this](const std::string &arg,
-                                 const std::shared_ptr<GoalHandle> &gh) {
+                                  const std::shared_ptr<GoalHandle> &gh) {
       return point_->run(arg, gh);
     };
 
@@ -125,7 +127,7 @@ public:
     };
 
     actionMap_["align"] = [this](const std::string &arg,
-                                 const std::shared_ptr<GoalHandle> &gh) {
+                                  const std::shared_ptr<GoalHandle> &gh) {
       return align_->run(arg, gh);
     };
 
@@ -140,7 +142,7 @@ public:
     };
 
     actionMap_["focus"] = [this](const std::string &arg,
-                                 const std::shared_ptr<GoalHandle> &gh) {
+                                  const std::shared_ptr<GoalHandle> &gh) {
       return focus_->run(arg, gh);
     };
 
@@ -166,6 +168,11 @@ public:
     actionMap_["find_pose"] = [this](const std::string &arg,
                                   const std::shared_ptr<GoalHandle> &gh) {
       return find_pose_->run(arg, gh);
+    };
+
+    actionMap_["analyze_objects"] = [this](const std::string &arg,
+                                  const std::shared_ptr<GoalHandle> &gh) {
+      return analyze_objects_->run(arg, gh);
     };
   }
 
@@ -271,6 +278,7 @@ private:
   std::shared_ptr<Focus> focus_;
   std::shared_ptr<Manipulation> manipulation_;
   std::shared_ptr<Take> take_;
+  std::shared_ptr<AnalyzeObjects> analyze_objects_;
 
   std::shared_ptr<Approach> approach_;
 
