@@ -11,9 +11,10 @@
 #include "executor_interfaces/msg/task_result.hpp"
 
 #include "executor_tools/Align.hpp"
-#include "executor_tools/Approach.hpp"
+// #include "executor_tools/Approach.hpp"
 #include "executor_tools/Check.hpp"
 #include "executor_tools/Drop.hpp"
+#include "executor_tools/FindSpace.hpp"
 #include "executor_tools/FindObject.hpp"
 #include "executor_tools/FindPerson.hpp"
 #include "executor_tools/FindPose.hpp"
@@ -82,6 +83,7 @@ public:
     find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_, knowledge_);
     find_pose_ = std::make_shared<FindPose>(node, hardware_, hri_, knowledge_);
     align_ = std::make_shared<Align>(node, hardware_, vision_);
+    find_space_ = std::make_shared<FindSpace>(node, hardware_);
     drop_ = std::make_shared<Drop>(node, hardware_);    
     find_object_ = std::make_shared<FindObject>(node, hardware_, vision_, knowledge_);
     focus_ = std::make_shared<Focus>(node, vision_);
@@ -89,7 +91,7 @@ public:
     take_ = std::make_shared<Take>(node, manipulation_, hardware_, knowledge_, hri_);
     analyze_objects_ = std::make_shared<AnalyzeObjects>(node, hardware_, vision_, knowledge_);
 
-    approach_ = std::make_shared<Approach>(node, hardware_, vision_, navigation_, knowledge_);
+    // approach_ = std::make_shared<Approach>(node, hardware_, vision_, navigation_, knowledge_);
 
     actionMap_["say"] = [this](const std::string &arg,
                                const std::shared_ptr<GoalHandle> &gh) {
@@ -136,6 +138,14 @@ public:
       return drop_->run(arg, gh);
     };
 
+    // find_space produce/valida la TF segura; drop solo la consume para la
+    // futura maniobra de brazo y gripper. Mantenerlas separadas evita mezclar
+    // percepcion/navegacion fina con manipulacion.
+    actionMap_["find_space"] = [this](const std::string &arg,
+                                      const std::shared_ptr<GoalHandle> &gh) {
+      return find_space_->run(arg, gh);
+    };
+
     actionMap_["find_object"] = [this](const std::string &arg,
                                        const std::shared_ptr<GoalHandle> &gh) {
       return find_object_->run(arg, gh);
@@ -155,10 +165,10 @@ public:
       return follow_->run(arg, gh);
     };
 
-    actionMap_["approach"] = [this](const std::string &arg,
-                                    const std::shared_ptr<GoalHandle> &gh) {
-      return approach_->run(arg, gh);
-    };
+    // actionMap_["approach"] = [this](const std::string &arg,
+    //                                 const std::shared_ptr<GoalHandle> &gh) {
+    //   return approach_->run(arg, gh);
+    // };
 
     actionMap_["take"] = [this](const std::string &arg,
                                 const std::shared_ptr<GoalHandle> &gh) {
@@ -273,6 +283,7 @@ private:
   std::shared_ptr<FindPerson> find_person_;
   std::shared_ptr<FindPose> find_pose_;
   std::shared_ptr<Align> align_;  
+  std::shared_ptr<FindSpace> find_space_;
   std::shared_ptr<Drop> drop_;
   std::shared_ptr<FindObject> find_object_;
   std::shared_ptr<Focus> focus_;
@@ -280,7 +291,7 @@ private:
   std::shared_ptr<Take> take_;
   std::shared_ptr<AnalyzeObjects> analyze_objects_;
 
-  std::shared_ptr<Approach> approach_;
+  // std::shared_ptr<Approach> approach_;
 
   std::unordered_map<std::string, ActionFunction> actionMap_;
 };
