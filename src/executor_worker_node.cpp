@@ -11,7 +11,7 @@
 #include "executor_interfaces/msg/task_result.hpp"
 
 #include "executor_tools/Align.hpp"
-// #include "executor_tools/Approach.hpp"
+#include "executor_tools/Approach.hpp"
 #include "executor_tools/Check.hpp"
 #include "executor_tools/Drop.hpp"
 #include "executor_tools/FindSpace.hpp"
@@ -91,7 +91,7 @@ public:
     take_ = std::make_shared<Take>(node, manipulation_, hardware_, knowledge_, hri_);
     analyze_objects_ = std::make_shared<AnalyzeObjects>(node, hardware_, vision_, knowledge_);
 
-    // approach_ = std::make_shared<Approach>(node, hardware_, vision_, navigation_, knowledge_);
+    approach_ = std::make_shared<Approach>(node, hardware_, vision_);
 
     actionMap_["say"] = [this](const std::string &arg,
                                const std::shared_ptr<GoalHandle> &gh) {
@@ -165,10 +165,10 @@ public:
       return follow_->run(arg, gh);
     };
 
-    // actionMap_["approach"] = [this](const std::string &arg,
-    //                                 const std::shared_ptr<GoalHandle> &gh) {
-    //   return approach_->run(arg, gh);
-    // };
+    actionMap_["approach"] = [this](const std::string &arg,
+                                    const std::shared_ptr<GoalHandle> &gh) {
+      return approach_->run(arg, gh);
+    };
 
     actionMap_["take"] = [this](const std::string &arg,
                                 const std::shared_ptr<GoalHandle> &gh) {
@@ -291,7 +291,7 @@ private:
   std::shared_ptr<Take> take_;
   std::shared_ptr<AnalyzeObjects> analyze_objects_;
 
-  // std::shared_ptr<Approach> approach_;
+  std::shared_ptr<Approach> approach_;
 
   std::unordered_map<std::string, ActionFunction> actionMap_;
 };
