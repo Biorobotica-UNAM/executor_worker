@@ -83,11 +83,11 @@ public:
     find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_, knowledge_);
     find_pose_ = std::make_shared<FindPose>(node, hardware_, hri_, knowledge_);
     align_ = std::make_shared<Align>(node, hardware_, vision_);
-    find_space_ = std::make_shared<FindSpace>(node, hardware_);
-    drop_ = std::make_shared<Drop>(node, hardware_);    
     find_object_ = std::make_shared<FindObject>(node, hardware_, vision_, knowledge_);
     focus_ = std::make_shared<Focus>(node, vision_);
     manipulation_ = std::make_shared<Manipulation>(node);
+    find_space_ = std::make_shared<FindSpace>(node, hardware_, knowledge_);
+    drop_ = std::make_shared<Drop>(node, manipulation_, hardware_, knowledge_, hri_);
     take_ = std::make_shared<Take>(node, manipulation_, hardware_, knowledge_, hri_);
     analyze_objects_ = std::make_shared<AnalyzeObjects>(node, hardware_, vision_, knowledge_);
 
