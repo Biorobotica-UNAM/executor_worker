@@ -29,6 +29,9 @@
 #include "executor_tools/Say.hpp"
 #include "executor_tools/Take.hpp"
 #include "executor_tools/Analyze.hpp"
+#include "executor_tools/SaveLoc.hpp"
+
+#include <optional>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "hardware_tools/Hardware.hpp"
@@ -72,6 +75,11 @@ public:
     navigation_ = std::make_shared<Navigation>(node);
     go_to_ = std::make_shared<GoTo>(node, navigation_);
 
+    customer_pose_map_ =
+        std::make_shared<std::optional<geometry_msgs::msg::PoseStamped>>(std::nullopt);
+
+    save_loc_ = std::make_shared<SaveLoc>(node, navigation_, customer_pose_map_);
+
     hardware_ = std::make_shared<Hardware>(node);
     check_ = std::make_shared<Check>(node, hardware_);
     point_ = std::make_shared<Point>(node, hardware_);
@@ -81,7 +89,7 @@ public:
 
     vision_ = std::make_shared<Vision>(node);
     find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_, knowledge_);
-    find_pose_ = std::make_shared<FindPose>(node, hardware_, hri_, knowledge_);
+    find_pose_ = std::make_shared<FindPose>(node, hardware_, hri_, knowledge_, customer_pose_map_);
     align_ = std::make_shared<Align>(node, hardware_, vision_);
     find_space_ = std::make_shared<FindSpace>(node, hardware_, knowledge_);
     drop_ = std::make_shared<Drop>(node, manipulation_, hardware_, knowledge_, hri_);
@@ -181,6 +189,11 @@ public:
                                   const std::shared_ptr<GoalHandle> &gh) {
       return analyze_objects_->run(arg, gh);
     };
+
+    actionMap_["saveloc"] = [this](const std::string &arg,
+                                   const std::shared_ptr<GoalHandle> &gh) {
+      return save_loc_->run(arg, gh);
+    };
   }
 
 private:
@@ -268,6 +281,8 @@ private:
 
   std::shared_ptr<Navigation> navigation_;
   std::shared_ptr<GoTo> go_to_;
+  std::shared_ptr<SaveLoc> save_loc_;
+  std::shared_ptr<std::optional<geometry_msgs::msg::PoseStamped>> customer_pose_map_;
 
   std::shared_ptr<Hardware> hardware_;
   std::shared_ptr<Check> check_;
