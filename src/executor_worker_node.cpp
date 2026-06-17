@@ -99,7 +99,7 @@ public:
     take_ = std::make_shared<Take>(node, manipulation_, hardware_, knowledge_, hri_);
     analyze_objects_ = std::make_shared<AnalyzeObjects>(node, hardware_, vision_, knowledge_);
 
-    approach_ = std::make_shared<Approach>(node, hardware_, vision_);
+    approach_ = std::make_shared<Approach>(node, hardware_, vision_, knowledge_);
 
     actionMap_["say"] = [this](const std::string &arg,
                                const std::shared_ptr<GoalHandle> &gh) {
