@@ -72,13 +72,7 @@ public:
     say_ = std::make_shared<Say>(node, hri_, knowledge_);
     listen_ = std::make_shared<Listen>(node, hri_, planning_, knowledge_);
 
-    navigation_ = std::make_shared<Navigation>(node);
-    go_to_ = std::make_shared<GoTo>(node, navigation_);
-
-    customer_pose_map_ =
-        std::make_shared<std::optional<geometry_msgs::msg::PoseStamped>>(std::nullopt);
-
-    save_loc_ = std::make_shared<SaveLoc>(node, navigation_, customer_pose_map_);
+    customer_pose_map_ = std::make_shared<std::optional<geometry_msgs::msg::PoseStamped>>(std::nullopt);
 
     hardware_ = std::make_shared<Hardware>(node);
     check_ = std::make_shared<Check>(node, hardware_);
@@ -86,6 +80,10 @@ public:
     give_ = std::make_shared<Give>(node, hardware_, knowledge_, hri_);
     receive_ = std::make_shared<Receive>(node, hardware_, hri_, knowledge_);
     follow_ = std::make_shared<Follow>(node);
+
+	navigation_ = std::make_shared<Navigation>(node);
+    go_to_ = std::make_shared<GoTo>(node, hardware_, navigation_);
+	save_loc_ = std::make_shared<SaveLoc>(node, navigation_, customer_pose_map_);
 
     vision_ = std::make_shared<Vision>(node);
     find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_, knowledge_);
@@ -190,7 +188,7 @@ public:
       return analyze_objects_->run(arg, gh);
     };
 
-    actionMap_["saveloc"] = [this](const std::string &arg,
+    actionMap_["save_loc"] = [this](const std::string &arg,
                                    const std::shared_ptr<GoalHandle> &gh) {
       return save_loc_->run(arg, gh);
     };
