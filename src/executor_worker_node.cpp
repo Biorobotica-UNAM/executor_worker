@@ -173,6 +173,11 @@ public:
       return approach_->run(arg, gh);
     };
 
+    actionMap_["approach_partial"] = [this](const std::string &arg,
+                                            const std::shared_ptr<GoalHandle> &gh) {
+      return approach_->runPartial(arg, gh);
+    };
+
     actionMap_["take"] = [this](const std::string &arg,
                                 const std::shared_ptr<GoalHandle> &gh) {
       return take_->run(arg, gh);
