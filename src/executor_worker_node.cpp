@@ -81,9 +81,9 @@ public:
     receive_ = std::make_shared<Receive>(node, hardware_, hri_, knowledge_);
     follow_ = std::make_shared<Follow>(node);
 
-	navigation_ = std::make_shared<Navigation>(node);
+    navigation_ = std::make_shared<Navigation>(node);
     go_to_ = std::make_shared<GoTo>(node, hardware_, navigation_);
-	save_loc_ = std::make_shared<SaveLoc>(node, navigation_, customer_pose_map_);
+    save_loc_ = std::make_shared<SaveLoc>(node, navigation_, hardware_, customer_pose_map_);
 
     vision_ = std::make_shared<Vision>(node);
     find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_, knowledge_);
