@@ -29,6 +29,7 @@
 #include "executor_tools/Say.hpp"
 #include "executor_tools/Take.hpp"
 #include "executor_tools/Analyze.hpp"
+#include "executor_tools/AnalyzePerson.hpp"
 #include "executor_tools/SaveLoc.hpp"
 
 #include <optional>
@@ -96,6 +97,7 @@ public:
     focus_ = std::make_shared<Focus>(node, vision_);
     take_ = std::make_shared<Take>(node, manipulation_, hardware_, knowledge_, hri_);
     analyze_objects_ = std::make_shared<AnalyzeObjects>(node, hardware_, vision_, knowledge_);
+    analyze_person_ = std::make_shared<AnalyzePerson>(node, hardware_, vision_, knowledge_);
 
     approach_ = std::make_shared<Approach>(node, hardware_, vision_, knowledge_, navigation_);
 
@@ -191,6 +193,11 @@ public:
     actionMap_["analyze_objects"] = [this](const std::string &arg,
                                   const std::shared_ptr<GoalHandle> &gh) {
       return analyze_objects_->run(arg, gh);
+    };
+
+    actionMap_["analyze_person"] = [this](const std::string &arg,
+                                  const std::shared_ptr<GoalHandle> &gh) {
+      return analyze_person_->run(arg, gh);
     };
 
     actionMap_["save_loc"] = [this](const std::string &arg,
@@ -305,6 +312,7 @@ private:
   std::shared_ptr<Manipulation> manipulation_;
   std::shared_ptr<Take> take_;
   std::shared_ptr<AnalyzeObjects> analyze_objects_;
+  std::shared_ptr<AnalyzePerson> analyze_person_;
 
   std::shared_ptr<Approach> approach_;
 
