@@ -104,6 +104,8 @@ public:
 
     approach_ = std::make_shared<Approach>(node, hardware_, vision_, knowledge_, navigation_);
 
+    fold_ = std::make_shared<Fold>(node, hardware_, hri_, vision_);
+
     actionMap_["say"] = [this](const std::string &arg,
                                const std::shared_ptr<GoalHandle> &gh) {
       return say_->run(arg, gh);
@@ -193,7 +195,7 @@ public:
       return find_pose_->run(arg, gh);
     };
 
-    actionMap_["analyze_objects"] = [this](const std::string &arg,
+    actionMap_["analyze_object"] = [this](const std::string &arg,
                                   const std::shared_ptr<GoalHandle> &gh) {
       return analyze_objects_->run(arg, gh);
     };
@@ -207,9 +209,16 @@ public:
                                    const std::shared_ptr<GoalHandle> &gh) {
       return save_loc_->run(arg, gh);
     };
+<<<<<<< Updated upstream
 	
 	actionMap_["fold"] = [this](const std::string &arg,
                                   const std::shared_ptr<GoalHandle> &gh) {
+=======
+
+    actionMap_["fold"] = [this](
+        const std::string &arg,
+        const std::shared_ptr<GoalHandle> &gh) {
+>>>>>>> Stashed changes
       return fold_->run(arg, gh);
     };
   }
@@ -325,6 +334,7 @@ private:
   std::shared_ptr<Fold> fold_;  
 
   std::shared_ptr<Approach> approach_;
+  std::shared_ptr<Fold> fold_;
 
   std::unordered_map<std::string, ActionFunction> actionMap_;
 };
