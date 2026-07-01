@@ -28,6 +28,7 @@
 #include "executor_tools/Result.hpp"
 #include "executor_tools/Say.hpp"
 #include "executor_tools/Take.hpp"
+#include "executor_tools/VerifyTake.hpp"
 #include "executor_tools/Analyze.hpp"
 #include "executor_tools/AnalyzePerson.hpp"
 #include "executor_tools/SaveLoc.hpp"
@@ -97,6 +98,7 @@ public:
     find_object_ = std::make_shared<FindObject>(node, hardware_, vision_, knowledge_);
     focus_ = std::make_shared<Focus>(node, vision_);
     take_ = std::make_shared<Take>(node, manipulation_, hardware_, knowledge_, hri_);
+    verify_take_ = std::make_shared<VerifyTake>(node, vision_, knowledge_);
     analyze_objects_ = std::make_shared<AnalyzeObjects>(node, hardware_, vision_, knowledge_);
     analyze_person_ = std::make_shared<AnalyzePerson>(node, hardware_, vision_, knowledge_);
 
@@ -186,6 +188,11 @@ public:
     actionMap_["take"] = [this](const std::string &arg,
                                 const std::shared_ptr<GoalHandle> &gh) {
       return take_->run(arg, gh);
+    };
+
+    actionMap_["verify_take"] = [this](const std::string &arg,
+                                       const std::shared_ptr<GoalHandle> &gh) {
+      return verify_take_->run(arg, gh);
     };
 
     actionMap_["find_pose"] = [this](const std::string &arg,
@@ -319,6 +326,7 @@ private:
   std::shared_ptr<Focus> focus_;
   std::shared_ptr<Manipulation> manipulation_;
   std::shared_ptr<Take> take_;
+  std::shared_ptr<VerifyTake> verify_take_;
   std::shared_ptr<AnalyzeObjects> analyze_objects_;
   std::shared_ptr<AnalyzePerson> analyze_person_;
 
