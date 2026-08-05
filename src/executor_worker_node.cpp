@@ -14,6 +14,7 @@
 #include "executor_tools/Approach.hpp"
 #include "executor_tools/Check.hpp"
 #include "executor_tools/Drop.hpp"
+#include "executor_tools/FindSpace.hpp"
 #include "executor_tools/FindObject.hpp"
 #include "executor_tools/FindPerson.hpp"
 #include "executor_tools/FindPose.hpp"
@@ -27,6 +28,13 @@
 #include "executor_tools/Result.hpp"
 #include "executor_tools/Say.hpp"
 #include "executor_tools/Take.hpp"
+#include "executor_tools/VerifyTake.hpp"
+#include "executor_tools/Analyze.hpp"
+#include "executor_tools/AnalyzePerson.hpp"
+#include "executor_tools/SaveLoc.hpp"
+#include "executor_tools/Fold.hpp"
+
+#include <optional>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "hardware_tools/Hardware.hpp"
@@ -67,27 +75,36 @@ public:
     say_ = std::make_shared<Say>(node, hri_, knowledge_);
     listen_ = std::make_shared<Listen>(node, hri_, planning_, knowledge_);
 
-    navigation_ = std::make_shared<Navigation>(node);
-    go_to_ = std::make_shared<GoTo>(node, navigation_);
+    customer_pose_map_ = std::make_shared<std::optional<geometry_msgs::msg::PoseStamped>>(std::nullopt);
 
     hardware_ = std::make_shared<Hardware>(node);
     check_ = std::make_shared<Check>(node, hardware_);
     point_ = std::make_shared<Point>(node, hardware_);
-    give_tool_ = std::make_shared<Give>(node, hardware_, hri_);
-    receive_tool_ = std::make_shared<Receive>(node, hardware_, hri_);
-    follow_tool_ = std::make_shared<Follow>(node);
+    give_ = std::make_shared<Give>(node, hardware_, knowledge_, hri_);
+    receive_ = std::make_shared<Receive>(node, hardware_, hri_, knowledge_);
+    follow_ = std::make_shared<Follow>(node);
+
+    navigation_ = std::make_shared<Navigation>(node);
+    go_to_ = std::make_shared<GoTo>(node, hardware_, navigation_);
+    save_loc_ = std::make_shared<SaveLoc>(node, navigation_, hardware_, customer_pose_map_);
 
     vision_ = std::make_shared<Vision>(node);
     find_person_ = std::make_shared<FindPerson>(node, hardware_, vision_, knowledge_);
-    find_pose_ = std::make_shared<FindPose>(node, hardware_, hri_, knowledge_);
+    find_pose_ = std::make_shared<FindPose>(node, hardware_, hri_, knowledge_, customer_pose_map_);
     align_ = std::make_shared<Align>(node, hardware_, vision_);
-    drop_ = std::make_shared<Drop>(node, hardware_);    
+    find_space_ = std::make_shared<FindSpace>(node, hardware_, knowledge_);
+    manipulation_ = std::make_shared<Manipulation>(node);
+    drop_ = std::make_shared<Drop>(node, manipulation_, hardware_, knowledge_, hri_);
     find_object_ = std::make_shared<FindObject>(node, hardware_, vision_, knowledge_);
     focus_ = std::make_shared<Focus>(node, vision_);
-    manipulation_ = std::make_shared<Manipulation>(node);
-    take_ = std::make_shared<Take>(node, manipulation_, hardware_, knowledge_);
+    take_ = std::make_shared<Take>(node, manipulation_, hardware_, knowledge_, hri_);
+    verify_take_ = std::make_shared<VerifyTake>(node, vision_, knowledge_);
+    analyze_objects_ = std::make_shared<AnalyzeObjects>(node, hardware_, vision_, knowledge_);
+    analyze_person_ = std::make_shared<AnalyzePerson>(node, hardware_, vision_, knowledge_);
 
-    approach_ = std::make_shared<Approach>(node, hardware_, vision_);
+	fold_ = std::make_shared<Fold>(node, hardware_, vision_);
+
+    approach_ = std::make_shared<Approach>(node, hardware_, vision_, knowledge_, navigation_);
 
     actionMap_["say"] = [this](const std::string &arg,
                                const std::shared_ptr<GoalHandle> &gh) {
@@ -100,23 +117,23 @@ public:
     };
 
     actionMap_["go_to"] = [this](const std::string &arg,
-                                 const std::shared_ptr<GoalHandle> &gh) {
+                                  const std::shared_ptr<GoalHandle> &gh) {
       return go_to_->run(arg, gh);
     };
 
     actionMap_["check"] = [this](const std::string &arg,
-                                 const std::shared_ptr<GoalHandle> &gh) {
+                                  const std::shared_ptr<GoalHandle> &gh) {
       return check_->run(arg, gh);
     };
 
     actionMap_["point"] = [this](const std::string &arg,
-                                 const std::shared_ptr<GoalHandle> &gh) {
+                                  const std::shared_ptr<GoalHandle> &gh) {
       return point_->run(arg, gh);
     };
 
     actionMap_["give"] = [this](const std::string &arg,
                                 const std::shared_ptr<GoalHandle> &gh) {
-      return give_tool_->run(arg, gh);
+      return give_->run(arg, gh);
     };
 
     actionMap_["find_person"] = [this](const std::string &arg,
@@ -125,7 +142,7 @@ public:
     };
 
     actionMap_["align"] = [this](const std::string &arg,
-                                 const std::shared_ptr<GoalHandle> &gh) {
+                                  const std::shared_ptr<GoalHandle> &gh) {
       return align_->run(arg, gh);
     };
 
@@ -134,23 +151,28 @@ public:
       return drop_->run(arg, gh);
     };
 
+    actionMap_["find_space"] = [this](const std::string &arg,
+                                      const std::shared_ptr<GoalHandle> &gh) {
+      return find_space_->run(arg, gh);
+    };
+
     actionMap_["find_object"] = [this](const std::string &arg,
                                        const std::shared_ptr<GoalHandle> &gh) {
       return find_object_->run(arg, gh);
     };
 
     actionMap_["focus"] = [this](const std::string &arg,
-                                 const std::shared_ptr<GoalHandle> &gh) {
+                                  const std::shared_ptr<GoalHandle> &gh) {
       return focus_->run(arg, gh);
     };
 
     actionMap_["receive"] = [this](const std::string &arg,
                                    const std::shared_ptr<GoalHandle> &gh) {
-      return receive_tool_->run(arg, gh);
+      return receive_->run(arg, gh);
     };
     actionMap_["follow"] = [this](const std::string &arg,
                                   const std::shared_ptr<GoalHandle> &gh) {
-      return follow_tool_->run(arg, gh);
+      return follow_->run(arg, gh);
     };
 
     actionMap_["approach"] = [this](const std::string &arg,
@@ -158,14 +180,44 @@ public:
       return approach_->run(arg, gh);
     };
 
+    actionMap_["approach_partial"] = [this](const std::string &arg,
+                                            const std::shared_ptr<GoalHandle> &gh) {
+      return approach_->runPartial(arg, gh);
+    };
+
     actionMap_["take"] = [this](const std::string &arg,
                                 const std::shared_ptr<GoalHandle> &gh) {
       return take_->run(arg, gh);
     };
 
+    actionMap_["verify_take"] = [this](const std::string &arg,
+                                       const std::shared_ptr<GoalHandle> &gh) {
+      return verify_take_->run(arg, gh);
+    };
+
     actionMap_["find_pose"] = [this](const std::string &arg,
                                   const std::shared_ptr<GoalHandle> &gh) {
       return find_pose_->run(arg, gh);
+    };
+
+    actionMap_["analyze_objects"] = [this](const std::string &arg,
+                                  const std::shared_ptr<GoalHandle> &gh) {
+      return analyze_objects_->run(arg, gh);
+    };
+
+    actionMap_["analyze_person"] = [this](const std::string &arg,
+                                  const std::shared_ptr<GoalHandle> &gh) {
+      return analyze_person_->run(arg, gh);
+    };
+
+    actionMap_["save_loc"] = [this](const std::string &arg,
+                                   const std::shared_ptr<GoalHandle> &gh) {
+      return save_loc_->run(arg, gh);
+    };
+	
+	actionMap_["fold"] = [this](const std::string &arg,
+                                  const std::shared_ptr<GoalHandle> &gh) {
+      return fold_->run(arg, gh);
     };
   }
 
@@ -254,23 +306,31 @@ private:
 
   std::shared_ptr<Navigation> navigation_;
   std::shared_ptr<GoTo> go_to_;
+  std::shared_ptr<SaveLoc> save_loc_;
+  std::shared_ptr<std::optional<geometry_msgs::msg::PoseStamped>> customer_pose_map_;
 
   std::shared_ptr<Hardware> hardware_;
   std::shared_ptr<Check> check_;
   std::shared_ptr<Point> point_;
-  std::shared_ptr<Give> give_tool_;
-  std::shared_ptr<Receive> receive_tool_;
-  std::shared_ptr<Follow> follow_tool_;
+  std::shared_ptr<Give> give_;
+  std::shared_ptr<Receive> receive_;
+  std::shared_ptr<Follow> follow_;
 
   std::shared_ptr<Vision> vision_;
   std::shared_ptr<FindPerson> find_person_;
   std::shared_ptr<FindPose> find_pose_;
   std::shared_ptr<Align> align_;  
+  std::shared_ptr<FindSpace> find_space_;
   std::shared_ptr<Drop> drop_;
   std::shared_ptr<FindObject> find_object_;
   std::shared_ptr<Focus> focus_;
   std::shared_ptr<Manipulation> manipulation_;
   std::shared_ptr<Take> take_;
+  std::shared_ptr<VerifyTake> verify_take_;
+  std::shared_ptr<AnalyzeObjects> analyze_objects_;
+  std::shared_ptr<AnalyzePerson> analyze_person_;
+
+  std::shared_ptr<Fold> fold_;  
 
   std::shared_ptr<Approach> approach_;
 
