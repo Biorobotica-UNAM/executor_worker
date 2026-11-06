@@ -107,8 +107,8 @@ public:
 
 	  fold_ = std::make_shared<Fold>(node, hardware_, vision_);
 
-	  test_head_ = std::make_shared<TestHead>(node, hardware_);
-    test_torso_ = std::make_shared<TestTorso>(node, hardware_);
+	  test_head_ = std::make_shared<TestHead>(node, hardware_, hri_);
+    test_torso_ = std::make_shared<TestTorso>(node, hardware_, hri_);
     test_arms_ = std::make_shared<TestArms>(node, hardware_, hri_);
 
     approach_ = std::make_shared<Approach>(node, hardware_, vision_, knowledge_, navigation_);
