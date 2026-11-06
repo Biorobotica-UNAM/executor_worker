@@ -33,6 +33,9 @@
 #include "executor_tools/AnalyzePerson.hpp"
 #include "executor_tools/SaveLoc.hpp"
 #include "executor_tools/Fold.hpp"
+#include "executor_tools/TestHead.hpp"
+#include "executor_tools/TestTorso.hpp"
+#include "executor_tools/TestArms.hpp"
 
 #include <optional>
 
@@ -103,6 +106,10 @@ public:
     analyze_person_ = std::make_shared<AnalyzePerson>(node, hardware_, vision_, knowledge_);
 
 	fold_ = std::make_shared<Fold>(node, hardware_, vision_);
+
+	test_head_ = std::make_shared<TestHead>(node, hardware_);
+    test_torso_ = std::make_shared<TestTorso>(node, hardware_);
+    test_arms_ = std::make_shared<TestArms>(node, hardware_);
 
     approach_ = std::make_shared<Approach>(node, hardware_, vision_, knowledge_, navigation_);
 
@@ -219,6 +226,21 @@ public:
                                   const std::shared_ptr<GoalHandle> &gh) {
       return fold_->run(arg, gh);
     };
+
+	actionMap_["test_head"] = [this](const std::string &arg,
+                                     const std::shared_ptr<GoalHandle> &gh) {
+      return test_head_->run(arg, gh);
+    };
+
+    actionMap_["test_torso"] = [this](const std::string &arg,
+                                      const std::shared_ptr<GoalHandle> &gh) {
+      return test_torso_->run(arg, gh);
+    };
+
+    actionMap_["test_arms"] = [this](const std::string &arg,
+                                     const std::shared_ptr<GoalHandle> &gh) {
+      return test_arms_->run(arg, gh);
+    };
   }
 
 private:
@@ -331,6 +353,10 @@ private:
   std::shared_ptr<AnalyzePerson> analyze_person_;
 
   std::shared_ptr<Fold> fold_;  
+
+  std::shared_ptr<TestHead> test_head_;
+  std::shared_ptr<TestTorso> test_torso_;
+  std::shared_ptr<TestArms> test_arms_;
 
   std::shared_ptr<Approach> approach_;
 
