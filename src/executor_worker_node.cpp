@@ -105,11 +105,11 @@ public:
     analyze_objects_ = std::make_shared<AnalyzeObjects>(node, hardware_, vision_, knowledge_);
     analyze_person_ = std::make_shared<AnalyzePerson>(node, hardware_, vision_, knowledge_);
 
-	fold_ = std::make_shared<Fold>(node, hardware_, vision_);
+	  fold_ = std::make_shared<Fold>(node, hardware_, vision_);
 
-	test_head_ = std::make_shared<TestHead>(node, hardware_);
+	  test_head_ = std::make_shared<TestHead>(node, hardware_);
     test_torso_ = std::make_shared<TestTorso>(node, hardware_);
-    test_arms_ = std::make_shared<TestArms>(node, hardware_);
+    test_arms_ = std::make_shared<TestArms>(node, hardware_, hri_);
 
     approach_ = std::make_shared<Approach>(node, hardware_, vision_, knowledge_, navigation_);
 
